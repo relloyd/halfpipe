@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: datascience
+  name: halfpipe-ing
+  labels:
+    app: halfpipe
+spec:
+  rules:
+  - host: halfpipe.dev.dataops.ri-tech.io
+    http:
+      paths:
+      - backend:
+          serviceName: halfpipe-service
+          servicePort: 80

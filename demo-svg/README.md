@@ -1,0 +1,8 @@
+* [Copy table snapshots](./cp-snapshot/README.md)
+* [Copy table changes / deltas](./cp-deltas/README.md)
+* [Rip an entire Oracle schema to Snowflake](./cp-full-schema/README.md)
+* [Start a micro-service to keep a Snowflake table up-to-date](./service/README.md)
+* [Synchronise table data from a source to target](./sync-batch/README.md)
+* [Stream table changes in real-time](./sync-events/README.md)
+* [Save the config file for a pipe action to run later](./pipes/README.md)
+* [Add connections to Oracle, Snowflake & S3](./connections/README.md)

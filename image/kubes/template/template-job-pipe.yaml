@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ConfigMap
+data:
+  {{ pipeNameNoSpaces }}.yaml: |
+{{ pipeDefinition }}
+metadata:
+  name: {{ pipeNameNoSpaces }}-yaml
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+  labels:
+    app: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+spec:
+  template:
+    metadata:
+      labels:
+        app: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+    spec:
+      containers:
+      - command:
+        - hp
+        - pipe
+        - -f
+        - /etc/pipes/{{ pipeNameNoSpaces }}.yaml
+        image: halfpipe:8
+        name: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-access-keys
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-access-keys
+              key: AWS_SECRET_ACCESS_KEY
+        volumeMounts:
+        - mountPath: /etc/pipes
+          name: pipes
+        - mountPath: /home/dataops/.halfpipe
+          name: connections
+        ports:
+        - containerPort: 8080
+      restartPolicy: OnFailure
+      volumes:
+      - name: connections
+        secret:
+          secretName: halfpipe-connections
+      - name: pipes
+        configMap:
+          name: {{ pipeNameNoSpaces }}-yaml
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+  name: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: hp-pipe-{{ pipeNameNoSpaces }}-yaml
+  type: NodePort
+
