@@ -6,7 +6,7 @@ data to and from the following RDBMS types:
 1. Oracle
 1. Snowflake
 1. S3 (okay it's not an RDBMS, but it can be a target below)
-1. (Postgres support pending - let me know if this would be useful)
+1. (Postgres & Teradata support pending <<< let me know if this would be useful to speed up your migrations)
 
 Among other things it supports:
 
@@ -66,7 +66,7 @@ $ hp
  \___|_  /(____  /____/__|           |____|   |__|   __/ \___  >
        \/      \/                                |__|        \/
 
-Half-Pipe is a DataOps utility for streaming data. It's designed to be light-weight and easy to use.
+Halfpipe is a DataOps utility for streaming data. It's designed to be light-weight and easy to use.
 Use command-line switches for pre-canned actions or write your own pipes in YAML or JSON to sync
 data in near real-time. Start an HTTP server to expose functionality via a RESTful API.
 Half-Pipe is not yet cluster-aware but it scales out. Start multiple instances of this tool and
@@ -83,6 +83,8 @@ Available Commands:
   query       Run a SQL query against a configured connection
   serve       Start a web service and listen for pipe commands described in JSON
   sync        Sync objects from source to target using batch or event-driven modes
+  user        Log in or out and show Halfpipe session details
+  version     Show version information for Halfpipe
   help        Help about any command
 
 Flags:
@@ -90,6 +92,66 @@ Flags:
 
 Use "hp [command] --help" for more information about a command.
 ```
+
+
+## Setup
+
+Follow the script below. Here's the summary:
+
+1. Add an Oracle connection
+1. Add a Snowflake connection
+1. Add a S3 connection to `ri-lake`
+1. Create a Snowflake stage compatible with Halfpipe
+
+```bash
+export ORA_USER=<Oracle user>
+export ORA_PASSWORD=<Oracle password>
+export ORA_HOST=<Oracle host>
+export ORA_PORT=<Oracle port>
+export ORA_SERVICE=<Oracle SID or service name>
+
+export SNOW_USER=<Snowflake user>
+export SNOW_PASSWORD=<Snowflake password>
+export SNOW_DATABASE=<RI_NGBI_DB or your clone DB name>
+export SNOW_SCHEMA=<target schema e.g. STAGE_DATA>
+export SNOW_ACCOUNT=<account name e.g. pt12345.eu-west-1>
+
+export BUCKET_NAME=<your S3 bucket for staging data>
+export BUCKET_PREFIX=<your S3 bucket prefix>
+
+hp config connections add oracle -c oracleA -d ${ORA_USER}/${ORA_PASSWORD}@//${ORA_HOME}:${ORA_PORT}/${ORA_SERVICE}
+hp config connections add snowflake -c snowflake -d ${SNOW_USER}:${SNOW_PASSWORD}@${SNOW_ACCOUNT}/${SNOW_DATABASE}?schema=${SNOW_SCHEMA}
+hp config connections add s3 -c s3bucket -d s3://${BUCKET_NAME}/${BUCKET_PREFIX}
+hp create stage snowflake -u s3://${BUCKET_NAME}/${BUCKET_PREFIX}  # <<< review the DDL and re-execute with -e flag added
+
+# Now you're all set to use the example commands in the tl;dr section above. 
+# Good luck and let me know if you run into any issues. Happy munging! 😄  
+```
+
+## Notes
+
+* Default flag values are picked up from file `~/.halfpipe/config.yml`
+* Database connections are stored in file `~/.halfpipe/connections.yaml`
+
+These files are AES-256 encrypted and base64 encoded at rest.
+
+Use the `config` CLI command to configure them.
+
+
+## Limitations
+
+* `hp sync events` does not work inside the Docker container fired up by `start-halfpipe.sh`... 
+The issue is that Oracle expects to be able to notify the HalfPipe (`hp`) process using an 
+open port. While the process appears to work and performs an initial table sync, 
+it silently never receives further notifications events. 
+Work around this when running the container on Linux by using host networking.
+Alternatively, take the `hp` binary out of the container and use matching Oracle drivers directly
+on a Linux host. 
+* `hp sync events` will stream DML changes from source to target, but where >=100 rows
+are committed per source transaction, it generates a full table re-sync as per the `hp sync batch`
+command. This requires Oracle priv `GRANT CHANGE NOTIFICATION TO <user>` to work.
+* `hp cp meta` doesn't produce ALTER TABLE statements yet. Drop the target table and recreate to 
+work around this.
 
 
 ## Want to know more or have a feature request?
