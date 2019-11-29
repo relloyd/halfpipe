@@ -44,10 +44,34 @@ hp cp snap oracleA.dim_time demo-data-lake
 
 # copy changes to Snowflake found in Oracle table DIM_TIME since the last time we looked, repeat every hour...
 # (SK_DATE is both the primary key and column that drives changes)
-hp cp delta oracleA.dwh.dim_time snowflake.dim_time -p sk_date -d sk_date -i 3600
+hp cp delta oracleA.dim_time snowflake.dim_time -p sk_date -d sk_date -i 3600
 
-# above we used a target connection for a S3 bucket called demo-data-lake - here's how to add it...
+# above we used a target connection called oracleA and a S3 bucket called demo-data-lake - here's how to add them...
+hp config connections add oracle -c oracleA -d <user>/<password>@//<host>:<port>/<database-name>
 hp config connections add s3 -c demo-data-lake -d s3://test.s3.reeslloyd.com
+
+# copy a snapshot of all data from database OracleA, schema object DIM_TIME to another Oracle database...
+hp cp snap oracleA.dim_time my-ora-connection.my_dim_time
+
+# create a Snowflake STAGE called MYSTAGE to load data from S3 
+# use -h for help or append -e to execute DDL...
+hp create stage snowflake -s MYSTAGE
+
+# synchronise all rows in source to target (make target data the same as source)...
+hp sync batch oracleA.dim_time snowflake.dim_time
+
+# stream data from DIM_TIME to Snowflake in real-time... 
+hp sync events oracleA.dim_time snowflake.dim_time
+
+# run a web service and listen for pipe actions in JSON/YAML...
+# see the demos animations above for examples
+hp serve 
+
+# configure default flag values to save time having to supply them on the CLI...
+hp config defaults -h
+
+# configure database connections...
+hp config connections -h
 
 # explore the demos above to see how you can add other connection types...
 # or perform more simple actions to move data quickly.
