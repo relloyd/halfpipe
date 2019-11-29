@@ -124,8 +124,8 @@ hp config connections add snowflake -c snowflake -d ${SNOW_USER}:${SNOW_PASSWORD
 hp config connections add s3 -c s3bucket -d s3://${BUCKET_NAME}/${BUCKET_PREFIX}
 hp create stage snowflake -u s3://${BUCKET_NAME}/${BUCKET_PREFIX}  # <<< review the DDL and re-execute with -e flag added
 
-# Now you're all set to use the example commands in the tl;dr section above. 
-# Good luck and let me know if you run into any issues. Happy munging! 😄  
+# now you're all set to use the example commands in the tl;dr section above... 
+# good luck and drop me an email (details below) if you run into any issues. Happy munging! 😄  
 ```
 
 ## Notes
