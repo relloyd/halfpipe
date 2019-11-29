@@ -51,7 +51,7 @@ hp cp delta oracleA.dim_time snowflake.dim_time -p sk_date -d sk_date -i 3600
 # more example of adding connections are in the Setup section below
 hp config connections add s3 -c demo-data-lake -d s3://test.s3.reeslloyd.com
 
-# copy a snapshot of all data from database OracleA, schema object DIM_TIME to another Oracle database...
+# copy a snapshot of all data from database OracleA, table DIM_TIME to another Oracle database...
 hp cp snap oracleA.dim_time my-ora-connection.my_dim_time
 
 # create a Snowflake STAGE called MYSTAGE to load data from S3 
