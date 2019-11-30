@@ -125,7 +125,7 @@ Follow the script below. Here's the summary:
 
 1. Add an Oracle connection
 1. Add a Snowflake connection
-1. Add a S3 connection to `ri-lake`
+1. Add a S3 connection
 1. Create a Snowflake stage compatible with Halfpipe
 
 ```bash
