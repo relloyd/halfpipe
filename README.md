@@ -81,7 +81,7 @@ hp config connections -h
 
 ## Usage & Deployment
 
-Halfpipe is a Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
+Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
 
 Choose one of these options to get going:
 
