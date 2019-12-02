@@ -85,10 +85,7 @@ Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 I
 
 Choose one of these options to get going:
 
-* Clone this repo and use bash script `start-halfpipe.sh` to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers.  This is the easy option that drops you into a command prompt ready to use the `hp` tool shown below;
-
-or...
-
+* Clone this repo and use bash script `start-halfpipe.sh` to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers.  This is the easy option that drops you into a command prompt ready to use the `hp` tool shown below; or...
 * Download one of the Release binaries and add it to your target environment.  You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go
 
 
