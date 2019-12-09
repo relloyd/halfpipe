@@ -16,9 +16,12 @@ usage() {
     echo $1
     echo
     echo "Usage: $0 -p <profile name> [-b] [-f]" 1>&2
-    echo "       - use -p to supply a profile name found in ~/.aws/credentials, to set AWS access keys in Halfpipe"
-    echo "       - use -b to force a Docker image build, else we will build once and run image, $image_name:$image_tag"
-    echo "       - use -f to start Halfpipe without setting AWS access keys"
+    echo ""
+    echo "   where:"
+    echo ""
+    echo "   -p supplies a profile name found in ~/.aws/credentials, to set AWS access keys in Halfpipe"
+    echo "   -b forces a Docker image build, else we will build once and run image, $image_name:$image_tag"
+    echo "   -f starts HalfPipe without setting AWS access keys (you'll need them to stage Snowflake data)"
     echo
     exit 1
 }
