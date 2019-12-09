@@ -50,6 +50,7 @@ spec:
       initContainers:
         - name: setup-config
           image: busybox
+          imagePullPolicy: IfNotPresent
           command:
           - sh
           - -c

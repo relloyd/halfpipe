@@ -7,8 +7,9 @@
 
 set -e
 script_dir=$(dirname "$0")
-k8s_job_template_yaml=${script_dir}/template/template-job-pipe.yaml
-generate_connections_script=${script_dir}/template/generate-k8s-connections.sh
+k8s_job_template_yaml=${script_dir}/.template/template-job-pipe.yaml
+generate_connections_script=${script_dir}/.template/generate-k8s-connections.sh
+replacer_script=${script_dir}/.template/replacer.pl
 default_halfpipe_tag="<export HP_VERSION to set>"
 default_halfpipe_image_tag="halfpipe:${HP_VERSION:-${default_halfpipe_tag}}"
 secrets=1  # enable deployment of connections by default
@@ -110,7 +111,7 @@ fi
 # Build command to do replacements in the template yaml file.
 
 cmd="cat \"${k8s_job_template_yaml}\" |
-    \"${script_dir}/template/replacer.pl\" \"${pipe_file_name}\" \"pipeNameNoSpaces=${pipe_name_no_spaces},halfpipeImageTag=${halfpipe_image_tag}\"
+    \"${replacer_script}\" \"${pipe_file_name}\" \"pipeNameNoSpaces=${pipe_name_no_spaces},halfpipeImageTag=${halfpipe_image_tag}\"
     ${kubectl_apply}"
 
 debug "Generated command:"
