@@ -1,4 +1,4 @@
-## Halfpipe
+## HalfPipe
 
 Halfpipe is a command-line utility for streaming 
 data to and from the following RDBMS types:
