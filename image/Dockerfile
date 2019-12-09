@@ -38,10 +38,14 @@ RUN mkdir -p /usr/local/k9s \
 
 USER dataops
 
+# Set the halfpipe version so scripts can use it as a default.
+
+ARG HP_VERSION
+ENV HP_VERSION=${HP_VERSION}
+
 # Scripts
 
 COPY --chown=dataops:dataops kubes/template/ /home/dataops/template/
-COPY --chown=dataops:dataops kubes/generate-k8s-connections.sh /home/dataops/
-COPY --chown=dataops:dataops kubes/generate-k8s-pipe-job.sh /home/dataops/
+COPY --chown=dataops:dataops kubes/generate-k8s-pipe-job /home/dataops/
 
 WORKDIR /home/dataops

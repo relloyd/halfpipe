@@ -26,7 +26,7 @@ spec:
         - pipe
         - -f
         - /etc/pipes/{{ pipeNameNoSpaces }}.yaml
-        image: halfpipe:8
+        image: {{ halfpipeImageTag }}
         name: hp-pipe-{{ pipeNameNoSpaces }}-yaml
         env:
         - name: AWS_ACCESS_KEY_ID
@@ -43,17 +43,33 @@ spec:
         - mountPath: /etc/pipes
           name: pipes
         - mountPath: /home/dataops/.halfpipe
-          name: connections
+          name: config-target
         ports:
         - containerPort: 8080
       restartPolicy: OnFailure
+      initContainers:
+        - name: setup-config
+          image: busybox
+          command:
+          - sh
+          - -c
+          - "cp -p /etc/config-source/connections.yaml /etc/config-target/connections.yaml && cp -p /etc/config-source/session.token /etc/config-target/session.token && chown -R 1000:1000 /etc/config-target"
+          volumeMounts:
+          - mountPath: /etc/config-source
+            name: config-source
+          - mountPath: /etc/config-target
+            name: config-target
       volumes:
-      - name: connections
+      - name: config-source
         secret:
-          secretName: halfpipe-connections
+          secretName: halfpipe-config
+      - name: config-target
+        emptyDir:
+          medium: Memory
       - name: pipes
         configMap:
           name: {{ pipeNameNoSpaces }}-yaml
+
 
 ---
 
