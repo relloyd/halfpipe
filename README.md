@@ -1,4 +1,4 @@
-## HalfPipe
+## Halfpipe
 
 Halfpipe is a command-line utility for streaming 
 data to and from the following RDBMS types:
@@ -190,4 +190,4 @@ work around this.
 
 I'd welcome your feedback. 
 
-Get in touch by raising an issue above or email me directly at `relloyd@gmail.com`
+Get in touch by raising an issue above or email me directly at `richard@halfpipe.sh`
