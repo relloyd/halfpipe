@@ -28,7 +28,7 @@ Among other things it supports:
 * [Save the config file for a pipe action to run later](./demo-svg/pipes/README.md)
 * [Configure connections to Oracle, Snowflake or S3](./demo-svg/connections/README.md)
 
-More sample commands are shown [below](#tldr-sample-commands)
+More sample commands are shown [below](#sample-commands)
 
 ## Usage & Deployment
 
@@ -112,7 +112,7 @@ hp create stage snowflake -u s3://${BUCKET_NAME}/${BUCKET_PREFIX}  # <<< review 
 ```
 
 
-## tl;dr Sample Commands
+## Sample Commands
 
 It's as simple as a single command to copy data snapshots or deltas between databases. 
 
