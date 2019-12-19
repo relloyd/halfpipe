@@ -28,6 +28,7 @@ Among other things it supports:
 * [Save the config file for a pipe action to run later](./demo-svg/pipes/README.md)
 * [Configure connections to Oracle, Snowflake or S3](./demo-svg/connections/README.md)
 
+More sample commands are shown [below](#tldr-sample-commands)
 
 ## Usage & Deployment
 
