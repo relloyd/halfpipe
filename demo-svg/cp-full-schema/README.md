@@ -1,10 +1,9 @@
 #### Copy A Full Schema From Oracle To Snowflake
 ![Copy Full Schema From Oracle To Snowflake](./hp-oracle-full-schema-cp-snap.svg)
 
-## Sample Commands
+## Commands To Rip An Oracle Schema To Snowflake
 
 Here are the sample commands from the demo animation above.
-
 
 ### Pre-requisites
 
@@ -28,7 +27,7 @@ $ hp create stage snowflake     # dumps the DDL
 $ hp create stage snowflake -e  # executes the DDL above
 ``` 
 
-### Steps To Rip The Schema
+### Steps
 
 First, we'll create the target Snowflake tables by converting Oracle table data types to Snowflake...
 
