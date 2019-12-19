@@ -37,7 +37,8 @@ __3) Create connections__ to Oracle & Snowflake:
 
 ### Steps
 
-First, we'll create the target Snowflake tables by converting Oracle table data types to Snowflake...
+First, we'll create the target Snowflake tables by converting Oracle table data types to Snowflake.
+Adjust the connection names `oracleA` and `snowflake` to match yours:
 
 ```bash
 $ hp query oracleA select table_name from user_tables order by 1 | while read lin; do
@@ -47,7 +48,8 @@ $ hp query oracleA select table_name from user_tables order by 1 | while read li
         done
 ```
 
-Next, let's copy the tables straight to Snowflake via S3...
+Next, let's copy the tables straight to Snowflake via S3.
+Adjust the connection names `oracleA` and `snowflake` to match yours:
 
 ```bash
 $ hp query oracleA select table_name from user_tables order by 1 | while read lin; do
@@ -56,3 +58,6 @@ $ hp query oracleA select table_name from user_tables order by 1 | while read li
         eval $cmd
         done
 ```
+
+You can change the SQL used in the commands to meet your needs and 
+don't forget to wrap the SQL in quotes to work around any shell expansion issues.
