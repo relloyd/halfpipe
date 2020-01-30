@@ -17,7 +17,7 @@ Among other things it supports:
 * Automatic conversion of table metadata DDL
 
 
-## tl;dr Demos & Sample Commands
+## tl;dr Features & Demos
 
 * [Copy table snapshots](./demo-svg/cp-snapshot/README.md)
 * [Copy table changes / deltas](./demo-svg/cp-deltas/README.md)
