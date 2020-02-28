@@ -191,6 +191,6 @@ work around this.
 
 I'd welcome your feedback. 
 
-Visit my website at [https://halfpipe.sh](https://halfpipe.sh)
+Visit my website over at [halfpipe.sh](https://halfpipe.sh)
 
-Get in touch by raising an issue above or email me directly at `richard@halfpipe.sh`
+Get in touch by raising an issue above or email me directly at `richard at halfpipe dot sh`
