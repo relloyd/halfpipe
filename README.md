@@ -18,6 +18,8 @@ Among other things it supports:
 
 ## tl;dr Features & Demos
 
+![](./halfpipe-subcommands.gif)
+
 * [Copy table snapshots](./demo-svg/cp-snapshot/README.md)
 * [Copy table changes / deltas](./demo-svg/cp-deltas/README.md)
 * [Rip an entire Oracle schema to Snowflake](./demo-svg/cp-full-schema/README.md) (contains sample commands)
