@@ -18,7 +18,7 @@ Among other things it supports:
 
 ## tl;dr Features & Demos
 
-![](./halfpipe-subcommands.gif)
+![](./halfpipe-subcommands-small.gif)
 
 * [Copy table snapshots](./demo-svg/cp-snapshot/README.md)
 * [Copy table changes / deltas](./demo-svg/cp-deltas/README.md)
