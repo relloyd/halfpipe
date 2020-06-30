@@ -15,9 +15,12 @@ template_variables=$(cat "${script_dir}/.template-variables.env")
 
 basic_usage_text="Suggested steps:
 
-  1. Use -h to view detailed help instructions to understand the following steps
-  2. Use -c to configure values for variables that will be required by step-3
-  3. Use -e to execute Halfpipe commands to set up connections and default CLI flag values
+  1. Use -h to view detailed help instructions to understand the
+     following steps
+  2. Use -c to configure values for variables that will be required
+     by step-3
+  3. Use -e to execute Halfpipe commands to set up connections and
+     default CLI flag values
 "
 
 hp_create_connection_cmds=(
@@ -53,8 +56,11 @@ hp_create_stage_cmds=(
 usage_basic() {
   cat <<EOF >&2
 Usage:
-
   $0 [-c | -e | -h]"
+
+  A script to configure Halfpipe with connections to Oracle, Snowflake
+  and S3. It sets default CLI flag values to simplify future
+  'hp' commands.
 
   ${basic_usage_text}
 EOF
