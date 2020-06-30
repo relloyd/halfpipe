@@ -9,6 +9,10 @@ declare -a hp_create_connection_cmds
 declare -a hp_configure_cli_cmds
 declare -a hp_create_stage_cmds
 
+script_dir=$(dirname "$0")
+
+template_variables=$(cat "${script_dir}/.template-variables.env")
+
 basic_usage_text="Suggested steps:
 
   1. Use -h to view detailed help instructions to understand the following steps
@@ -69,38 +73,7 @@ Usage:
   -c  Requests user input for the following variables and shows
       their values if they're already set in the environment:"
 
-        # ---------------------------------------------------------------------
-        # Oracle credetials
-        # ---------------------------------------------------------------------
-        export ORA_USER=<user>
-        export ORA_PASSWORD=<password>
-        export ORA_HOST=<hostname>
-        export ORA_PORT=<port>
-        export ORA_SERVICE=<SID or service>
-
-        # ---------------------------------------------------------------------
-        # Snowflake credentials & stage name
-        # ---------------------------------------------------------------------
-        export SNOW_USER=<user>
-        export SNOW_PASSWORD=<password>
-        export SNOW_DATABASE=<database>
-        export SNOW_SCHEMA=<schema (optional)>
-        export SNOW_ACCOUNT=<account>
-        export SNOW_STAGE_NAME=HALFPIPE_STAGE
-
-        # ---------------------------------------------------------------------
-        # S3 bucket details
-        # ---------------------------------------------------------------------
-        export BUCKET_REGION=<region e.g. eu-west-1>
-        export BUCKET_NAME=<bucket name no trailing slash>
-        export BUCKET_PREFIX=<bucket prefix no leading slash (default 'halfpipe')>
-
-        # ---------------------------------------------------------------------
-        # Miscellaneous default CLI flag values
-        # ---------------------------------------------------------------------
-        export LOG_LEVEL=warn
-        export LAST_MODIFIED_FIELD_NAME=LAST_MODIFIED_DATE
-        export DELTA_SIZE=30
+${template_variables}
 
   -c  Executes the following Halfpipe commands to perform initial setup.
       Each command will be printed and confirmation requested first.
