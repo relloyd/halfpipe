@@ -11,11 +11,11 @@ __1) Configure default values__ for the following flags.
 This allows the commands further below to work in their simplest form:
 
 ```bash
-$ hp config defaults -k s3-bucket -v <bucket>
-$ hp config defaults -k s3-prefix -v <prefix>
-$ hp config defaults -k s3-region -v <aws region e.g. eu-west-1>
-$ hp config defaults -k s3-url -v s3://<bucket>/<prefix>  # ensure this matches the combined bucket and prefix used above (apologies for the duplication, i'll fix this soon)
-$ hp config defaults -k stage -v <stage name>
+$ hp config defaults add -k s3-bucket -v <bucket>
+$ hp config defaults add -k s3-prefix -v <prefix>
+$ hp config defaults add -k s3-region -v <aws region e.g. eu-west-1>
+$ hp config defaults add -k s3-url -v s3://<bucket>/<prefix>  # ensure this matches the combined bucket and prefix used above (apologies for the duplication, i'll fix this soon)
+$ hp config defaults add -k stage -v <stage name>
 ```
 
 __2) Create a Snowflake STAGE__ that is compatible with Halfpipe:
