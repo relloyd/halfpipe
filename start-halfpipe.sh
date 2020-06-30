@@ -88,7 +88,7 @@ mkdir -p ~/.halfpipe
 # Add defaults for the first time.
 if [[ ! -f "$HOME/.halfpipe/config.yaml" ]]; then  # if there are no existing config defaults...
   echo "Using default config file config.yaml"
-  cp "${script_dir}/default.config.yaml" "$HOME/.halfpipe/config.yaml"
+  cp "${script_dir}/.default-config.yaml" "$HOME/.halfpipe/config.yaml"
 fi
 
 # Start Halfpipe container.
