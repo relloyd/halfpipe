@@ -18,7 +18,7 @@ Among other things it supports:
 
 ## tl;dr Features & Demos
 
-![](./halfpipe-subcommands.gif)
+![](./resources/halfpipe-subcommands.gif)
 
 * [Copy table snapshots](./demo-svg/cp-snapshot/README.md)
 * [Copy table changes / deltas](./demo-svg/cp-deltas/README.md)
@@ -96,14 +96,14 @@ export ORA_SERVICE=<Oracle SID or service name>
 
 export SNOW_USER=<Snowflake user>
 export SNOW_PASSWORD=<Snowflake password>
-export SNOW_DATABASE=<RI_NGBI_DB or your clone DB name>
+export SNOW_DATABASE=<database or clone name>
 export SNOW_SCHEMA=<target schema e.g. STAGE_DATA>
 export SNOW_ACCOUNT=<account name e.g. pt12345.eu-west-1>
 
 export BUCKET_NAME=<your S3 bucket for staging data>
 export BUCKET_PREFIX=<your S3 bucket prefix>
 
-hp config connections add oracle -c oracleA -d ${ORA_USER}/${ORA_PASSWORD}@//${ORA_HOME}:${ORA_PORT}/${ORA_SERVICE}
+hp config connections add oracle -c oracleA -d ${ORA_USER}/${ORA_PASSWORD}@//${ORA_HOST}:${ORA_PORT}/${ORA_SERVICE}
 hp config connections add snowflake -c snowflake -d ${SNOW_USER}:${SNOW_PASSWORD}@${SNOW_ACCOUNT}/${SNOW_DATABASE}?schema=${SNOW_SCHEMA}
 hp config connections add s3 -c s3bucket -d s3://${BUCKET_NAME}/${BUCKET_PREFIX}
 hp create stage snowflake -u s3://${BUCKET_NAME}/${BUCKET_PREFIX}  # <<< review the DDL and re-execute with -e flag added
