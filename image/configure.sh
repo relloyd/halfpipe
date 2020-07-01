@@ -57,8 +57,9 @@ hp_configure_cli_cmds=(
 )
 
 hp_aws_cmds=(
-        [0]="export AWS_ACCESS_KEY_ID=\"\$(aws configure get \${AWS_PROFILE}.aws_access_key_id)\""
-        [1]="export AWS_SECRET_ACCESS_KEY=\"\$(aws configure get \${AWS_PROFILE}.aws_secret_access_key)\""
+        # set and export in separate commands to catch errors with 'set -e'.
+        [0]="AWS_ACCESS_KEY_ID=\"\$(aws configure get \${AWS_PROFILE}.aws_access_key_id)\" && export AWS_ACCESS_KEY_ID"
+        [1]="AWS_SECRET_ACCESS_KEY=\"\$(aws configure get \${AWS_PROFILE}.aws_secret_access_key)\" && export AWS_SECRET_ACCESS_KEY"
 )
 
 hp_create_stage_cmds=(
