@@ -47,5 +47,7 @@ ENV HP_VERSION=${HP_VERSION}
 
 COPY --chown=dataops:dataops kubes/template/ /home/dataops/.template/
 COPY --chown=dataops:dataops kubes/create-k8s-pipe-job /home/dataops/
+COPY --chown=dataops:dataops configure.sh /home/dataops/
+COPY --chown=dataops:dataops .template-variables.env /home/dataops/
 
 WORKDIR /home/dataops

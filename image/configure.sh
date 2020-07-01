@@ -13,14 +13,27 @@ script_dir=$(dirname "$0")
 
 template_variables=$(cat "${script_dir}/.template-variables.env")
 
-basic_usage_text="Suggested steps:
+basic_usage_text="Usage: $0 [-c | -e | -h]
 
-  1. Use -h to view detailed help instructions to understand the
-     following steps
-  2. Use -c to configure values for variables that will be required
-     by step-3
-  3. Use -e to execute Halfpipe commands to set up connections and
-     default CLI flag values
+  A script to configure Halfpipe with connections to Oracle, Snowflake
+  and S3. It also sets default CLI flag values to simplify future
+  'hp' commands.
+
+  Prerequisites:
+
+  1. S3 bucket that can be used as part of a Snowflake external stage
+  2. AWS IAM access keys for the bucket (read/write) added to file
+     ~/.aws/credentials in a profile/section called 'halfpipe'
+  3. Credentials for Oracle and Snowflake databases
+
+  Suggested steps:
+
+  1. Use -h to view detailed help instructions and understand the
+     following steps:
+  2. Use -c to configure values for environment variables that
+     will be required by step-3:
+  3. Use -e to execute Halfpipe commands that set up connections
+     and default CLI flag values
 "
 
 hp_create_connection_cmds=(
@@ -44,8 +57,8 @@ hp_configure_cli_cmds=(
 )
 
 hp_aws_cmds=(
-        [0]="export AWS_ACCESS_KEY_ID=\"\$(aws configure get halfpipe.aws_access_key_id)\""
-        [1]="export AWS_SECRET_ACCESS_KEY=\"\$(aws configure get halfpipe.aws_secret_access_key)\""
+        [0]="export AWS_ACCESS_KEY_ID=\"\$(aws configure get \${AWS_PROFILE}.aws_access_key_id)\""
+        [1]="export AWS_SECRET_ACCESS_KEY=\"\$(aws configure get \${AWS_PROFILE}.aws_secret_access_key)\""
 )
 
 hp_create_stage_cmds=(
@@ -55,25 +68,14 @@ hp_create_stage_cmds=(
 
 usage_basic() {
   cat <<EOF >&2
-Usage:
-  $0 [-c | -e | -h]"
-
-  A script to configure Halfpipe with connections to Oracle, Snowflake
-  and S3. It sets default CLI flag values to simplify future
-  'hp' commands.
-
-  ${basic_usage_text}
+${basic_usage_text}
 EOF
   exit 1
 }
 
 usage_full() {
     cat <<EOF >&2
-Usage:
-
-  $0 [-c | -e | -h]" 1>&2
-
-  ${basic_usage_text}
+${basic_usage_text}
   where:
 
   -c  Requests user input for the following variables and shows
@@ -118,7 +120,7 @@ ${template_variables}
         # They would normally be supplied as flags to the 'hp create' command
         # but this saves us from exposing secrets/values here.
         # This assumes you have a section in ~/.aws/credentials called
-        # 'halfpipe'.
+        # '${AWS_PROFILE}'.
         # ---------------------------------------------------------------------
 
         ${hp_aws_cmds[0]}
@@ -144,12 +146,19 @@ function exportVariable() {
   # $1 = variable name
   # $2 = prompt / text
   # $3 = set this to cause silent input for reading passwords (any non-zero value)
+  # $4 = set this to supply a default value (optional)
   var=$1
+  default="${!var}"
   prompt=$2
   secret=$3
-  fallback=$4
-  if [[ -n ${!var} ]]; then # if there is already a default value for the supplied variable...
-    default="${!var}"
+  override=$4
+  if [[ -z "$default" && -n "$override" ]]; then  # if there is no default but we have been given one to override...
+    default="${override}"  # set the default explicitely.
+    export "${var}"="${override}" # export, i.e. reset the input variable to the default value.
+    # Don't print the default as it's going to be in square brackets:
+    #   prompt=$(printf "%s %s" "${prompt}" "(default: '${default}')")  # show the default in the prompt.
+  fi
+  if [[ -n ${default} ]]; then # if there is a default value for the supplied variable...
     # print the prompt and request for input with the current default value in brackets.
     if [[ -n "${secret}" ]]; then # if we should keep the input value secret...
       # print the prompt with obfuscated default value...
@@ -168,18 +177,21 @@ function exportVariable() {
     read -r
   fi
   if [[ -n $REPLY ]]; then # if the user supplied a new value...
-    export "${var}"="${REPLY:-$fallback}" # export, i.e. reset the input variable to the new value.
+    export "${var}"="${REPLY}" # export, i.e. reset the input variable to the new value.
   fi
 }
 
 function executeCmd() {
   # Execute a single command supplied as $1, with user confirmation requested to continue.
   cmd=$1
+  skip_confirmation=$2
   echo "Execute:"
   echo "  ${cmd}"
-  printf "Continue? [y]/n: "
-  read -r
-  if [[ -z "${REPLY}" || "${REPLY}" == 'Y' ]]; then  # if the user wants to continue...
+  if [[ -z "${skip_confirmation}" ]]; then
+    printf "Continue? [y]/n: "
+    read -r
+  fi
+  if [[ -z "${REPLY}" || "${REPLY}" == 'Y' || -n "${skip_confirmation}" ]]; then  # if the user wants to continue...
     eval "${cmd}"
   else
     echo Skipped.
@@ -203,9 +215,14 @@ function executeHalfpipeSetupCommands() {
     for i in "${!hp_aws_cmds[@]}"; do
       executeCmd "${hp_aws_cmds[$i]}"
     done
-    for i in "${!hp_create_stage_cmds[@]}"; do
-      executeCmd "${hp_create_stage_cmds[$i]}"
-    done
+    # Check if user wants to preview DDL for CREATE STAGE command:
+    printf "Preview DDL before creating Snowflake external stage (%s)? y/[n]: " "${SNOW_STAGE_NAME}"
+    read -r
+    if [[ "${REPLY}" == "y" ]]; then  # if we should show Snowflake CREATE STAGE DDL first...
+      executeCmd "${hp_create_stage_cmds[0]}" "skip-confirmation"
+    fi
+    echo "Creating the external stage..."
+    executeCmd "${hp_create_stage_cmds[1]}" # execute the DDL to create the Snowflake stage.
   fi
   echo "Setup complete."
 }
@@ -243,13 +260,14 @@ if [[ "${action}" == "configure" ]]; then
   exportVariable "SNOW_DATABASE" "Enter Snowflake database (or export SNOW_DATABASE)"
   exportVariable "SNOW_SCHEMA" "Enter Snowflake schema (or export SNOW_SCHEMA)"
   exportVariable "SNOW_ACCOUNT" "Enter Snowflake account (or export SNOW_ACCOUNT)"
-  exportVariable "SNOW_STAGE_NAME" "Enter Snowflake external stage name (or export SNOW_STAGE_NAME)"
+  exportVariable "SNOW_STAGE_NAME" "Enter Snowflake external stage name (or export SNOW_STAGE_NAME)" "" "HALFPIPE_STAGE"
   exportVariable "BUCKET_REGION" "Enter S3 region (or export BUCKET_REGION)"
   exportVariable "BUCKET_NAME" "Enter S3 bucket name (or export BUCKET_NAME)"
-  if [[ -z "${BUCKET_PREFIX}" ]]; then
-    export BUCKET_PREFIX=halfpipe
-  fi
-  exportVariable "BUCKET_PREFIX" "Enter S3 bucket prefix (or export BUCKET_PREFIX) (default 'halfpipe')" ""
+  exportVariable "BUCKET_PREFIX" "Enter S3 bucket prefix (or export BUCKET_PREFIX)" "" "halfpipe"
+  exportVariable "AWS_PROFILE" "Enter AWS profile (or export AWS_PROFILE)" "" "default"
+  exportVariable "HP_LOG_LEVEL" "Enter Halfpipe log level (info|warn|error) (or export HP_LOG_LEVEL)" "" "warn"
+  exportVariable "HP_LAST_MODIFIED_FIELD_NAME" "Enter Halfpipe last modified field name (or export HP_LAST_MODIFIED_FIELD_NAME)" "" "LAST_MODIFIED_DATE"
+  exportVariable "HP_DELTA_SIZE" "Enter Halfpipe delta size (or export HP_DELTA_SIZE)" "" "30"
   # Configure Halfpipe.
   echo ""
   executeHalfpipeSetupCommands
