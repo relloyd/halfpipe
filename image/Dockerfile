@@ -6,7 +6,11 @@ FROM relloyd/halfpipe-oracle-${ORA_VERSION}-no-oci:${HP_VERSION}
 USER root
 
 RUN apt-get update -y \
-    && apt-get install -y alien curl less vim libaio1 ca-certificates
+    && apt-get install -y alien curl less vim libaio1 ca-certificates unzip glibc-source groff \
+    && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm awscliv2.zip
 
 # Oracle client
 

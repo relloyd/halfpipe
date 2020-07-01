@@ -10,7 +10,7 @@ declare -a hp_configure_cli_cmds
 declare -a hp_create_stage_cmds
 
 script_dir=$(dirname "$0")
-
+aws_default_profile=default
 template_variables=$(cat "${script_dir}/.template-variables.env")
 
 basic_usage_text="Usage: $0 [-c | -e | -h]
@@ -21,10 +21,11 @@ basic_usage_text="Usage: $0 [-c | -e | -h]
 
   Prerequisites:
 
-  1. S3 bucket that can be used as part of a Snowflake external stage
-  2. AWS IAM access keys for the bucket (read/write) added to file
-     ~/.aws/credentials in a profile/section called 'halfpipe'
-  3. Credentials for Oracle and Snowflake databases
+  1. A Snowflake instance and database connection details
+  2. Oracle database connection details
+  3. S3 bucket that can be used as part of a Snowflake external stage
+  4. AWS IAM access keys for the bucket (read/write) configured in file
+     ~/.aws/credentials, in profile/section: '$aws_default_profile'
 
   Suggested steps:
 
@@ -265,7 +266,7 @@ if [[ "${action}" == "configure" ]]; then
   exportVariable "BUCKET_REGION" "Enter S3 region (or export BUCKET_REGION)"
   exportVariable "BUCKET_NAME" "Enter S3 bucket name (or export BUCKET_NAME)"
   exportVariable "BUCKET_PREFIX" "Enter S3 bucket prefix (or export BUCKET_PREFIX)" "" "halfpipe"
-  exportVariable "AWS_PROFILE" "Enter AWS profile (or export AWS_PROFILE)" "" "default"
+  exportVariable "AWS_PROFILE" "Enter AWS profile (or export AWS_PROFILE)" "" "$aws_default_profile"
   exportVariable "HP_LOG_LEVEL" "Enter Halfpipe log level (info|warn|error) (or export HP_LOG_LEVEL)" "" "warn"
   exportVariable "HP_LAST_MODIFIED_FIELD_NAME" "Enter Halfpipe last modified field name (or export HP_LAST_MODIFIED_FIELD_NAME)" "" "LAST_MODIFIED_DATE"
   exportVariable "HP_DELTA_SIZE" "Enter Halfpipe delta size (or export HP_DELTA_SIZE)" "" "30"
