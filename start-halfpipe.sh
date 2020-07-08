@@ -15,17 +15,22 @@ default_port=8080
 default_aws_profile=halfpipe
 
 usage() {
-  echo
-  echo "Usage: $0 [ -a <AWS profile name> ] [-b] [-k] [-p <port>]" 1>&2
-  echo ""
-  echo "    Start Halfpipe in a Docker container preconfigured with Oracle Instant Client ${ORA_VERSION}"
-  echo "    where:"
-  echo ""
-  echo "   -a  supplies a profile name found in ~/.aws/credentials, to set AWS access keys in the container (default: ${default_aws_profile})"
-  echo "   -b  forces a Docker image build, else I will build once and run image, $image_name:$image_tag"
-  echo "   -k  mounts .kube/config into the container so you can launch Kubernetes jobs easily"
-  echo "   -p  port to expose for Halfpipe's micro-service used by 'hp pipe' commands (default: $default_port)"
-  echo
+  cat <<EOF 1>&2
+
+Usage: $0 [ -a <AWS profile name> ] [-b] [-k] [-p <port>]"
+
+    Start Halfpipe in a Docker container preconfigured with Oracle Instant Client ${ORA_VERSION}
+    where:
+
+   -a  supplies a profile name found in '$HOME/.aws/credentials'
+       to set AWS access keys in the container (default: ${default_aws_profile})
+   -b  forces a Docker image build, else it will build once and run image: $image_name:$image_tag
+   -k  mounts directory '$HOME/.kube' into the container so you can launch
+       Kubernetes jobs easily
+   -p  port to expose for Halfpipe's micro-service used by 'hp pipe' commands
+       (default: $default_port)
+
+EOF
   exit 1
 }
 
@@ -45,12 +50,19 @@ while getopts ":a:fbkp:" o; do
 done
 shift $((OPTIND-1))
 
-if [[ -z "${profile}" ]]; then  # if the profile has NOT been set...
+if [[ -z "${aws_profile}" ]]; then  # if the profile has NOT been set...
   aws_profile="${default_aws_profile}"  # use the default.
 fi
 
-if [[ "$kube" -eq 1 ]]; then  # if we should mount .kube/config...
-  kube_mount="-v ~/.kube:/home/dataops/.kube"
+if [[ "$kube" -eq 1 ]]; then  # if we should mount ~/.kube/config...
+  if [[ -d "$HOME/.kube" ]]; then  # if the directory exists...
+    # Get ready to mount the directory.
+    kube_mount="-v \"$HOME/.kube\":/home/dataops/.kube"
+  else  # else there is no .kube directory...
+    # Abort.
+    echo "Error: \"$HOME/.kube\" directory not found and -k flag specified"
+    usage
+  fi
 fi
 
 if [[ -z "$port" ]]; then  # if the port has NOT been set...
