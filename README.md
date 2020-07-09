@@ -37,8 +37,13 @@ Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 I
 
 Choose *one* of these options to get going:
 
-* Clone this repo and use bash script `start-halfpipe.sh` to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers.  This is the easy option that drops you into a command prompt ready to use the `hp` tool shown below; or...
-* Download one of the Release binaries and add it to your target environment.  You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go
+A) 
+
+Use the [Getting Started](#Getting-Started) instructions to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the `configure.sh` script (usage shown below)
+
+B) 
+
+Download one of the Release binaries and add it to your target environment. You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. Run the `configure.sh` script to learn how to set up basic connections.
 
 
 ```
@@ -78,39 +83,42 @@ Use "hp [command] --help" for more information about a command.
 ```
 
 
-## Setup
+## Getting Started
 
-Follow the script below. Here's the summary:
+The following steps will walk through option *A* above.  It will...
 
 1. Add an Oracle connection
 1. Add a Snowflake connection
 1. Add a S3 connection
 1. Create a Snowflake stage compatible with Halfpipe
+1. Set default flag values for the `hp` CLI
+
+After this, you'll be all set to use the example commands [below](#sample-commands) and in the tl;dr section above. Good luck and drop me an email (details below) if you run into any issues. Happy munging! 😄  
+
+### Prerequisites
+
+1. Docker
+2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called 'halfpipe')
+3. An S3 bucket that can be used as an external Snowflake stage  
+
+### Steps
 
 ```bash
-export ORA_USER=<Oracle user>
-export ORA_PASSWORD=<Oracle password>
-export ORA_HOST=<Oracle host>
-export ORA_PORT=<Oracle port>
-export ORA_SERVICE=<Oracle SID or service name>
+# Build the Halfpipe Docker image
+# This supplies an AWS profile called 'halfpipe' to the container by default
+# See the command usage to override the AWS profile name...
 
-export SNOW_USER=<Snowflake user>
-export SNOW_PASSWORD=<Snowflake password>
-export SNOW_DATABASE=<database or clone name>
-export SNOW_SCHEMA=<target schema e.g. STAGE_DATA>
-export SNOW_ACCOUNT=<account name e.g. pt12345.eu-west-1>
+$ ./start-halfpipe.sh  
 
-export BUCKET_NAME=<your S3 bucket for staging data>
-export BUCKET_PREFIX=<your S3 bucket prefix>
+# Once you're inside the Docker image, run this script to create connections and set default flag values:
 
-hp config connections add oracle -c oracleA -d ${ORA_USER}/${ORA_PASSWORD}@//${ORA_HOST}:${ORA_PORT}/${ORA_SERVICE}
-hp config connections add snowflake -c snowflake -d ${SNOW_USER}:${SNOW_PASSWORD}@${SNOW_ACCOUNT}/${SNOW_DATABASE}?schema=${SNOW_SCHEMA}
-hp config connections add s3 -c s3bucket -d s3://${BUCKET_NAME}/${BUCKET_PREFIX}
-hp create stage snowflake -u s3://${BUCKET_NAME}/${BUCKET_PREFIX}  # <<< review the DDL and re-execute with -e flag added
+$ ./configure.sh -c
 
-# now you're all set to use the example commands in the tl;dr section above... 
-# good luck and drop me an email (details below) if you run into any issues. Happy munging! 😄  
+$ # Now you're good to go...
 ```
+
+* `start-halfpipe.sh` will build a Docker image that contains the Halfpipe CLI and Oracle drivers. Use `-h` to see usage. 
+* `configure.sh -c` will request input for database credentials and run basic setup to create connections to Oracle, Snowflake & S3. Here's an [example](./configure/README.md) of it in action. Alternatively, use `configure.sh -h` to learn more.  
 
 
 ## Sample Commands
@@ -121,32 +129,32 @@ Here are a few sample actions - the demos above cover them all in more detail.
 
 ```bash
 # copy a snapshot of all data from Oracle table DIM_TIME to Snowflake via S3...
-hp cp snap oracleA.dim_time snowflake.dim_time
+hp cp snap oracle.dim_time snowflake.dim_time
 
 # copy a snapshot of all data from Oracle table DIM_TIME to a S3 bucket connection...
-hp cp snap oracleA.dim_time demo-data-lake
+hp cp snap oracle.dim_time demo-data-lake
 
 # copy changes to Snowflake found in Oracle table DIM_TIME since the last time we looked
 # repeat every hour...
 # (SK_DATE is both the primary key and column that drives changes)
-hp cp delta oracleA.dim_time snowflake.dim_time -p sk_date -d sk_date -i 3600
+hp cp delta oracle.dim_time snowflake.dim_time -p sk_date -d sk_date -i 3600
 
 # above we used a target connection called demo-data-lake for a S3 bucket - here's how to add it...
 # more example of adding connections are in the Setup section below
 hp config connections add s3 -c demo-data-lake -d s3://test.s3.reeslloyd.com
 
 # copy a snapshot of all data from database OracleA, table DIM_TIME, to another Oracle database...
-hp cp snap oracleA.dim_time my-ora-connection.my_dim_time
+hp cp snap oracle.dim_time my-ora-connection.my_dim_time
 
 # create a Snowflake STAGE called MYSTAGE to load data from S3 
 # use -h for help or append -e to execute DDL...
 hp create stage snowflake -s MYSTAGE
 
 # synchronise all rows in source to target (make target data the same as source)...
-hp sync batch oracleA.dim_time snowflake.dim_time
+hp sync batch oracle.dim_time snowflake.dim_time
 
 # stream data from DIM_TIME to Snowflake in real-time... 
-hp sync events oracleA.dim_time snowflake.dim_time
+hp sync events oracle.dim_time snowflake.dim_time
 
 # run a web service and listen for pipe actions in JSON/YAML...
 # see the demos animations above for examples
