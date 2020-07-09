@@ -1,4 +1,4 @@
-# How To Configure Halfpipe in 2 mins
+# How To Configure Halfpipe in 2mins
 
 Here's an animation of the Halfpipe CLI being started in a Docker image using script [`start-halfpipe.sh`](../../start-halfpipe.sh), which is included at the root of this repo.
 
