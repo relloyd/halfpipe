@@ -75,25 +75,23 @@ Choose *one* of these options to get going:
 
 A) 
 
-Use the [Getting Started](#Getting-Started) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure) script (usage shown below)
+Use the [Get Started](#get-started) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure) script.
 
 B) 
 
 Download one of the Release binaries and add it to your target environment. You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. Run the `configure.sh` script to learn how to set up basic connections.
 
-## Getting Started
+## Get Started
 
-The following steps will walk through option A above, to:
+The following steps will walk through option A above to:-
 
-1. Add an Oracle connection
-1. Add a Snowflake connection
-1. Add a S3 connection
-1. Create a Snowflake stage compatible with Halfpipe
-1. Set default flag values for the `hp` CLI
+1. add connections for an Oracle database, Snowflake and S3
+1. create a Snowflake external stage compatible with Halfpipe
+1. set default flag values for the `hp` CLI
 
-After this, you'll be ready to use the example commands [below](#sample-commands) and in the tl;dr section [above](#tldr-features--demos). 
+After this, you'll be ready to use the example commands shown [below](#sample-commands) or in the [tl;dr section](#tldr-features--demos) above. 
 
-Good luck and drop me an email ([details below](#want-to-know-more-or-have-a-feature-request)) if you run into any issues. Happy munging! 😄  
+Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) if you run into any issues. Happy munging! 😄  
 
 ### Prerequisites
 
@@ -101,14 +99,12 @@ Good luck and drop me an email ([details below](#want-to-know-more-or-have-a-fea
 2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called "halfpipe" - override it below)
 3. An S3 bucket that can be used as an external Snowflake stage
 4. Oracle database connection details
-5. Snowflake database connection details (see the [`configure.sh`](demo-svg/configure) script if you're not using Snowflake)  
+5. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure) documentation to learn more if you're not using Snowflake)  
 
 ### Steps
 
 ```bash
-# Build the Halfpipe Docker image
-# This supplies an AWS profile called "halfpipe" to the container by default
-# See the command usage (`-h` flag) to override the AWS profile name...
+# Build and start the Halfpipe Docker image with default AWS_PROFILE=halfpipe...
 
 $ ./start-halfpipe.sh
 
@@ -117,11 +113,15 @@ $ ./start-halfpipe.sh
 
 $ ./configure.sh -c
 
-$ # Follow the prompts and you're good to go...
+$ # Follow the prompts and you're good to go.
 ```
 
-* `start-halfpipe.sh` will build a Docker image that contains the Halfpipe CLI and Oracle drivers. Use `-h` to see usage. 
-* `configure.sh -c` will request input for database credentials and run basic setup to create connections to Oracle, Snowflake and S3. Here's an [example](./demo-svg/configure/README.md) of it in action. Alternatively, use `configure.sh -h` to learn more or see this link.  
+* `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
+  By default it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
+  Use `-h` to see usage and the `-a` flag to override this  
+* `configure.sh -c` requests user input and runs basic set-up to create connections to Oracle, Snowflake and S3. 
+  Here's an example [transcript](./demo-svg/configure). See the help output of [`configure.sh -h`](./demo-svg/configure#usage-of-configuresh) 
+  to learn more about the `hp` commands required to create connections and set default flag values.  
 
 
 ## Sample Commands
