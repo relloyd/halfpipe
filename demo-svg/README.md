@@ -1,3 +1,4 @@
+* [Configure Halfpipe in 2mins](./configure/README.md)
 * [Copy table snapshots](./cp-snapshot/README.md)
 * [Copy table changes / deltas](./cp-deltas/README.md)
 * [Rip an entire Oracle schema to Snowflake](./cp-full-schema/README.md)
