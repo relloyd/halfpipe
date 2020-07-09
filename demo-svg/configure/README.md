@@ -10,7 +10,7 @@ The [original video](https://www.loom.com/share/a6a2743443f1480db50040e70aafe1f0
 
 Here's the transcript from the animation above:
 
-```bash
+```
 $ # How to get started with Halfpipe. Go from zero to migrated-data in 2 mins.
 $
 $ # First, let's clone the halfpipe Git repo...
@@ -67,7 +67,7 @@ halfpipe:~ $ # the Halfpipe 'hp' command usage is above for info.
 halfpipe:~ $ # now we can log in...
 halfpipe:~ $ # supply your auth key instead of mine below:
 halfpipe:~ $
-halfpipe:~ $ hp user login 4Jq2gBJw478D7oseDaV9X9BUVEYQp2fOzAGFqtXyDZr26uJCbsQ
+halfpipe:~ $ hp user login <my-auth-key>
 
 Halfpipe session started:
   Current user:		richard at halfpipe dot sh
