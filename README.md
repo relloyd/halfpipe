@@ -126,9 +126,11 @@ $ # Follow the prompts and you're good to go...
 
 ## Sample Commands
 
-It's as simple as a single command to copy data snapshots or deltas between databases. 
+Once you have connections setup, it's as simple as a single command to copy data snapshots or deltas between databases. 
 
-Here are a few sample actions - the demos above cover them all in more detail. 
+Here are a few sample actions - the demos above cover them all in more detail.
+
+Alternatively head over to https://halfpipe.sh/in-detail/#learn to see a set of short videos that explain some of the features. 
 
 ```bash
 # copy a snapshot of all data from Oracle table DIM_TIME to Snowflake via S3...
