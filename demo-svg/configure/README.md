@@ -1,13 +1,14 @@
 # How To Configure Halfpipe in 2 mins
 
-Here's a GIF animation of the Halfpipe CLI being started in a Docker image using `start-halfpipe.sh` included in this repo.
-The included `configure.sh` script is used to create basic connections to Oracle, Snowflake and S3. 
+Here's an animation of the Halfpipe CLI being started in a Docker image using script `start-halfpipe.sh` which is included at the root of this repo.
 
-The [original video](https://www.loom.com/share/ae65e58ecbcd4ca3a9f0b144e94522a9) is available on Loom.   
+The video shows how easy it is to setup Halfpipe with connections to Oracle, Snowflake and S3, using script [`configure.sh`](#usage-of-configuresh) (added to the image).
+ 
+The [original video](https://www.loom.com/share/a6a2743443f1480db50040e70aafe1f0) is available on Loom.   
 
 ![](./halfpipe-setup.gif)
 
-Here's the script from the above GIF
+Here's the transcript from the animation above:
 
 ```bash
 $ # How to get started with Halfpipe. Go from zero to migrated-data in 2 mins.
@@ -251,4 +252,131 @@ halfpipe:~ $
 halfpipe:~ $ # to see the 'cp snap' command and others in action, I have a series of short videos on my website, https://halfpipe.sh/in-detail/#learn
 halfpipe:~ $ # now you're in a great place to play with all the other features of Halfpipe!
 halfpipe:~ $ # thanks for watching and happy data munging 😄
+```
+
+# Usage Of `configure.sh`
+
+```bash
+➜  image git:(master) ✗ ./configure.sh -h
+Usage: ./configure.sh [-c | -e | -h]
+
+  A script to configure Halfpipe with connections to Oracle, Snowflake
+  and S3. It also sets default CLI flag values to simplify future
+  'hp' commands.
+
+  Prerequisites:
+
+  1. A Snowflake instance and database connection details
+  2. Oracle database connection details
+  3. S3 bucket that can be used as part of a Snowflake external stage
+  4. AWS IAM access keys for the bucket (read/write) configured in file
+     ~/.aws/credentials, in profile/section: 'default'
+
+  Suggested steps:
+
+  1. Use -h to view detailed help instructions and understand the
+     following steps:
+  2. Use -c to configure values for environment variables that
+     will be required by step-3:
+  3. Use -e to execute Halfpipe commands that set up connections
+     and default CLI flag values
+
+  where:
+
+  -c  Requests user input for the following variables and shows
+      their values if they're already set in the environment:"
+
+        # ---------------------------------------------------------------------
+        # Oracle credetials
+        # ---------------------------------------------------------------------
+        export ORA_USER=<user>
+        export ORA_PASSWORD=<password>
+        export ORA_HOST=<hostname>
+        export ORA_PORT=<port>
+        export ORA_SERVICE=<SID or service>
+
+        # ---------------------------------------------------------------------
+        # Snowflake credentials & external stage name
+        # ---------------------------------------------------------------------
+        export SNOW_USER=<user>
+        export SNOW_PASSWORD=<password>
+        export SNOW_DATABASE=<database>
+        export SNOW_SCHEMA=<schema (optional)>
+        export SNOW_ACCOUNT=<account>
+        export SNOW_STAGE_NAME=<name of Snowflake external stage: default: 'HALFPIPE_STAGE'>
+
+        # ---------------------------------------------------------------------
+        # S3 bucket details to be used as a Snowflake external stage
+        # ---------------------------------------------------------------------
+        export BUCKET_REGION=<region e.g. eu-west-1>
+        export BUCKET_NAME=<bucket name no trailing slash>
+        export BUCKET_PREFIX=<bucket prefix no leading slash (default: 'halfpipe')>
+
+        # ---------------------------------------------------------------------
+        # AWS environment variables, used to fetch access keys for
+        # creating a Snowflake external stage
+        # ---------------------------------------------------------------------
+        export AWS_PROFILE=<profile name from ~/.aws/credentials to find AWS access keys (default: 'default')>
+
+        # ---------------------------------------------------------------------
+        # Miscellaneous default CLI flag values
+        # ---------------------------------------------------------------------
+        export HP_LAST_MODIFIED_FIELD_NAME=<field name to drive incremental (cp delta) pipelines: default: 'LAST_MODIFIED_DATE'>
+        export HP_DELTA_SIZE=<range of data to fetch in one chunk in incremental pipelins: default: 30>
+        export HP_LOG_LEVEL=<info|warn|error (default: 'warn') where warn produces stats only>
+
+  -c  Executes the following Halfpipe commands to perform initial setup.
+      Each command will be printed and confirmation requested first.
+      If the variables above are already set in your environment, you should
+      be able to copy-paste this and execute it to achieve the same results.
+
+        # ---------------------------------------------------------------------
+        # Create connections with logical names:
+        # 1. oracleA
+        # 2. snowflake
+        # 3. s3
+        # ---------------------------------------------------------------------
+
+        hp config connections add oracle -f -c oracleA \
+          -d "${ORA_USER}/${ORA_PASSWORD}@//${ORA_HOST}:${ORA_PORT}/${ORA_SERVICE}"
+        hp config connections add snowflake -f -c snowflake \
+          -d "${SNOW_USER}:${SNOW_PASSWORD}@${SNOW_ACCOUNT}/${SNOW_DATABASE}?schema=${SNOW_SCHEMA}"
+        hp config connections add s3 -f -c s3 \
+          -d "s3://${BUCKET_NAME}/${BUCKET_PREFIX}"
+
+        # ---------------------------------------------------------------------
+        # Configure CLI default flag values to save having to enter them later.
+        # The values are forced in with -f flag so beware existing values.
+        # Ensure the value of s3-url matches the combined s3-bucket and
+        # s3-prefix using the format: 's3://<bucket>/<prefix>'
+        # The value of s3-prefix is optional.
+        # Apologies for the duplication - i'll fix this soon.
+        # ---------------------------------------------------------------------
+
+        hp config defaults add -f -k s3-region -v "${BUCKET_REGION}"
+        hp config defaults add -f -k s3-bucket -v "s3://${BUCKET_NAME}"
+        hp config defaults add -f -k s3-prefix -v "${BUCKET_PREFIX}"
+        hp config defaults add -f -k s3-url -v "s3://${BUCKET_NAME}/${BUCKET_PREFIX}"
+        hp config defaults add -f -k stage -v "${SNOW_STAGE_NAME}"
+
+        # ---------------------------------------------------------------------
+        # Configure S3 IAM access keys.
+        # Export AWS variables ready to setup a Snowflake external stage
+        # They would normally be supplied as flags to the 'hp create' command
+        # but this saves us from exposing secrets/values here.
+        # This assumes you have a section in ~/.aws/credentials called
+        # ''.
+        # ---------------------------------------------------------------------
+
+        AWS_ACCESS_KEY_ID="$(aws configure get ${AWS_PROFILE}.aws_access_key_id)" && export AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY="$(aws configure get ${AWS_PROFILE}.aws_secret_access_key)" && export AWS_SECRET_ACCESS_KEY
+
+        # ---------------------------------------------------------------------
+        # Create a Snowflake external stage called HALFPIPE_STAGE:
+        # 1. Show Snowflake DDL
+        # 2. Execute the DDL
+        # ---------------------------------------------------------------------
+
+        hp create stage snowflake -s ${SNOW_STAGE_NAME} -u "s3://${BUCKET_NAME}/${BUCKET_PREFIX}"
+        hp create stage snowflake -s ${SNOW_STAGE_NAME} -u "s3://${BUCKET_NAME}/${BUCKET_PREFIX}" -e
 ```
