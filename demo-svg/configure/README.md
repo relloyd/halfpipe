@@ -256,7 +256,7 @@ halfpipe:~ $ # thanks for watching and happy data munging 😄
 
 # Usage Of `configure.sh`
 
-```bash
+```
 ➜  image git:(master) ✗ ./configure.sh -h
 Usage: ./configure.sh [-c | -e | -h]
 
