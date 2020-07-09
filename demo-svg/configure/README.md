@@ -1,6 +1,6 @@
 # How To Configure Halfpipe in 2 mins
 
-Here's an animation of the Halfpipe CLI being started in a Docker image using script `start-halfpipe.sh`, which is included at the root of this repo.
+Here's an animation of the Halfpipe CLI being started in a Docker image using script [`start-halfpipe.sh`](../../start-halfpipe.sh), which is included at the root of this repo.
 
 The video shows how easy it is to set up Halfpipe with connections to Oracle, Snowflake and S3 - using script [`configure.sh`](#usage-of-configuresh) (added to the image).
  
@@ -70,7 +70,7 @@ halfpipe:~ $
 halfpipe:~ $ hp user login 4Jq2gBJw478D7oseDaV9X9BUVEYQp2fOzAGFqtXyDZr26uJCbsQ
 
 Halfpipe session started:
-  Current user:		richard@reeslloyd.com
+  Current user:		richard at halfpipe dot sh
   Authorized until:	Thu, 31 Dec 2020 00:00:00 UTC
   Logout time:		Fri, 10 Jul 2020 11:48:12 UTC (23h59m59s)
 

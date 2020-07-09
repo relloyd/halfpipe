@@ -31,21 +31,6 @@ Among other things it supports:
 
 More [sample commands](#sample-commands) are shown below.
 
-## Usage & Deployment
-
-Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
-
-Choose *one* of these options to get going:
-
-A) 
-
-Use the [Getting Started](#Getting-Started) instructions to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the `configure.sh` script (usage shown below)
-
-B) 
-
-Download one of the Release binaries and add it to your target environment. You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. Run the `configure.sh` script to learn how to set up basic connections.
-
-
 ```
 $ hp
   ___ ___        .__   _____        __________.__
@@ -82,10 +67,23 @@ Flags:
 Use "hp [command] --help" for more information about a command.
 ```
 
+## Usage & Deployment
+
+Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
+
+Choose *one* of these options to get going:
+
+A) 
+
+Use the [Getting Started](#Getting-Started) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure) script (usage shown below)
+
+B) 
+
+Download one of the Release binaries and add it to your target environment. You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. Run the `configure.sh` script to learn how to set up basic connections.
 
 ## Getting Started
 
-The following steps will walk through option *A* above.  It will...
+The following steps will walk through option A above, to:
 
 1. Add an Oracle connection
 1. Add a Snowflake connection
@@ -93,7 +91,9 @@ The following steps will walk through option *A* above.  It will...
 1. Create a Snowflake stage compatible with Halfpipe
 1. Set default flag values for the `hp` CLI
 
-After this, you'll be all set to use the example commands [below](#sample-commands) and in the tl;dr section above. Good luck and drop me an email (details below) if you run into any issues. Happy munging! 😄  
+After this, you'll be ready to use the example commands [below](#sample-commands) and in the tl;dr section [above](#tldr-features--demos). 
+
+Good luck and drop me an email ([details below](#want-to-know-more-or-have-a-feature-request)) if you run into any issues. Happy munging! 😄  
 
 ### Prerequisites
 
@@ -101,7 +101,7 @@ After this, you'll be all set to use the example commands [below](#sample-comman
 2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called "halfpipe" - override it below)
 3. An S3 bucket that can be used as an external Snowflake stage
 4. Oracle database connection details
-5. Snowflake database connection details (see the `configure.sh` script usage below)  
+5. Snowflake database connection details (see the [`configure.sh`](demo-svg/configure) script if you're not using Snowflake)  
 
 ### Steps
 
