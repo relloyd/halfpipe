@@ -5,7 +5,7 @@ The included `configure.sh` script is used to create basic connections to Oracle
 
 The [original video](https://www.loom.com/share/ae65e58ecbcd4ca3a9f0b144e94522a9) is available on Loom.   
 
-[](./halfpipe-setup.gif)
+![](./halfpipe-setup.gif)
 
 Here's the script from the above GIF
 
