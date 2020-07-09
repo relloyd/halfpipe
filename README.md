@@ -98,27 +98,30 @@ After this, you'll be all set to use the example commands [below](#sample-comman
 ### Prerequisites
 
 1. Docker
-2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called 'halfpipe')
-3. An S3 bucket that can be used as an external Snowflake stage  
+2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called "halfpipe" - override it below)
+3. An S3 bucket that can be used as an external Snowflake stage
+4. Oracle database connection details
+5. Snowflake database connection details (see the `configure.sh` script usage below)  
 
 ### Steps
 
 ```bash
 # Build the Halfpipe Docker image
-# This supplies an AWS profile called 'halfpipe' to the container by default
-# See the command usage to override the AWS profile name...
+# This supplies an AWS profile called "halfpipe" to the container by default
+# See the command usage (`-h` flag) to override the AWS profile name...
 
-$ ./start-halfpipe.sh  
+$ ./start-halfpipe.sh
 
-# Once you're inside the Docker image, run this script to create connections and set default flag values:
+# Once you're inside the Docker image, run this script to create connections
+# and set default flag values:
 
 $ ./configure.sh -c
 
-$ # Now you're good to go...
+$ # Follow the prompts and you're good to go...
 ```
 
 * `start-halfpipe.sh` will build a Docker image that contains the Halfpipe CLI and Oracle drivers. Use `-h` to see usage. 
-* `configure.sh -c` will request input for database credentials and run basic setup to create connections to Oracle, Snowflake & S3. Here's an [example](./configure/README.md) of it in action. Alternatively, use `configure.sh -h` to learn more.  
+* `configure.sh -c` will request input for database credentials and run basic setup to create connections to Oracle, Snowflake and S3. Here's an [example](./demo-svg/configure/README.md) of it in action. Alternatively, use `configure.sh -h` to learn more or see this link.  
 
 
 ## Sample Commands

@@ -1,6 +1,13 @@
-[](https://www.loom.com/share/ae65e58ecbcd4ca3a9f0b144e94522a9)
+# How To Configure Halfpipe in 2 mins
 
-The following is the script from the above video:
+Here's a GIF animation of the Halfpipe CLI being started in a Docker image using `start-halfpipe.sh` included in this repo.
+The included `configure.sh` script is used to create basic connections to Oracle, Snowflake and S3. 
+
+The [original video](https://www.loom.com/share/ae65e58ecbcd4ca3a9f0b144e94522a9) is available on Loom.   
+
+[](./halfpipe-setup.gif)
+
+Here's the script from the above GIF
 
 ```bash
 $ # How to get started with Halfpipe. Go from zero to migrated-data in 2 mins.
