@@ -118,7 +118,7 @@ $ # Follow the prompts and you're good to go.
 
 * `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
   By default it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
-  Use `-h` to see usage and the `-a` flag to override this  
+  Use `-h` to see usage and the `-a` flag to override this.  
 * `configure.sh -c` requests user input and runs basic set-up to create connections to Oracle, Snowflake and S3. 
   Here's an example [transcript](./demo-svg/configure). See the help output of [`configure.sh -h`](./demo-svg/configure#usage-of-configuresh) 
   to learn more about the `hp` commands required to create connections and set default flag values.  
