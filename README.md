@@ -75,7 +75,7 @@ Choose *one* of these options to get going:
 
 A) 
 
-Use the [Get Started](#get-started) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure) script.
+Use the [Get Started](#get-started) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure/README.md) script.
 
 B) 
 
@@ -96,10 +96,10 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 ### Prerequisites
 
 1. Docker
-2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called "halfpipe" - override it below)
+2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called "halfpipe" - notes on how to override it are below)
 3. An S3 bucket that can be used as an external Snowflake stage
 4. Oracle database connection details
-5. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure) documentation to learn more if you're not using Snowflake)  
+5. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure/README.md) documentation to learn more if you're not using Snowflake)  
 
 ### Steps
 
@@ -120,7 +120,7 @@ $ # Follow the prompts and you're good to go.
   By default it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
   Use `-h` to see usage and the `-a` flag to override this.  
 * `configure.sh -c` requests user input and runs basic set-up to create connections to Oracle, Snowflake and S3. 
-  Here's an example [transcript](./demo-svg/configure). See the help output of [`configure.sh -h`](./demo-svg/configure#usage-of-configuresh) 
+  Here's an example [transcript](./demo-svg/configure/README.md). See the help output of [`configure.sh -h`](./demo-svg/configure/README.md#usage-of-configuresh) 
   to learn more about the `hp` commands required to create connections and set default flag values.  
 
 
