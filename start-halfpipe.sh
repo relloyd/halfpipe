@@ -2,7 +2,7 @@
 
 set -e  # exit after any failure
 
-HP_VERSION=1
+HP_VERSION=2
 ORA_VERSION=19.5
 K8S_VERSION=v1.13.1  # include k8s leading 'v'
 

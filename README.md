@@ -108,17 +108,24 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 
 $ ./start-halfpipe.sh
 
-# Once you're inside the Docker image, run this script to create connections
-# and set default flag values:
+# Once you're inside the Docker image, log in using a valid auth key like the 
+# one shown in the command below.
+
+$ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
+
+# Run this script to create connections and set default flag values...
+# Follow the prompts and you're good to go:
 
 $ ./configure.sh -c
-
-$ # Follow the prompts and you're good to go.
 ```
 
 * `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
   By default it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
-  Use `-h` to see usage and the `-a` flag to override this.  
+  Use `-h` to see usage and the `-a` flag to override this.
+* The `hp user login` command above is valid for a user called `tester1@halfpipe.sh`. It has privileges required
+  to configure Halfpipe and execute core actions like `cp meta`, `cp snap` and `query`. 
+  If you are interested to take more features for a spin, please reach out to me using my [email](#want-to-know-more-or-have-a-feature-request) below.
+  See the [Notes](#notes) below for some security considerations.
 * `configure.sh -c` requests user input and runs basic set-up to create connections to Oracle, Snowflake and S3. 
   Here's an example [transcript](./demo-svg/configure/README.md). See the help output of [`configure.sh -h`](./demo-svg/configure/README.md#usage-of-configuresh) 
   to learn more about the `hp` commands required to create connections and set default flag values.  
@@ -178,12 +185,17 @@ hp config connections -h
 
 ## Notes
 
-* Default flag values are picked up from file `~/.halfpipe/config.yml`
-* Database connections are stored in file `~/.halfpipe/connections.yaml`
+The following files are AES-256 encrypted and base64 encoded at rest:
 
-These files are AES-256 encrypted and base64 encoded at rest.
+* Default flag values are picked up from file `~/.halfpipe/config.yml`
+* Database connections are stored in file `~/.halfpipe/connections.yaml` 
 
 Use the `config` CLI command to configure them.
+
+When a user session is started by running command `hp user login <auth-key>`, anyone with access to the CLI can essentially 
+use the database connections. Use `hp user logout` to end the session. 
+
+See usage by running `hp user login -h` and the `-d` flag to configure session duration. Default duration is 1 day.
 
 
 ## Limitations
