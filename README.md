@@ -85,6 +85,7 @@ Download one of the Release binaries and add it to your target environment. You'
 
 The following steps will walk through option A above to:-
 
+1. build a local Docker image containing Halfpipe and Oracle client drivers
 1. add connections for an Oracle database, Snowflake and S3
 1. create a Snowflake external stage compatible with Halfpipe
 1. set default flag values for the `hp` CLI
@@ -96,10 +97,10 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 ### Prerequisites
 
 1. Docker
-2. A valid profile entry in AWS CLI file `~/.aws/credentials` that can read/write an S3 bucket (by default this needs to be called "halfpipe" - notes on how to override it are below)
-3. An S3 bucket that can be used as an external Snowflake stage
-4. Oracle database connection details
-5. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure/README.md) documentation to learn more if you're not using Snowflake)  
+1. An S3 bucket to be used as an external Snowflake stage
+1. A valid profile entry in AWS CLI file `~/.aws/credentials` (by default this needs to be called `halfpipe` - notes on how to override it are below) that can read/write the S3 bucket above
+1. Oracle database connection details
+1. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure/README.md) documentation to learn more if you're not using Snowflake)  
 
 ### Steps
 
