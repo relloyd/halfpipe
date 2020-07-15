@@ -65,12 +65,12 @@ Use "hp [command] --help" for more information about a command.
 
 halfpipe:~ $ # the Halfpipe 'hp' command usage is above for info.
 halfpipe:~ $ # now we can log in...
-halfpipe:~ $ # supply your auth key instead of mine below:
+halfpipe:~ $ # supply your auth key or use this one that has privs to run core features:
 halfpipe:~ $
-halfpipe:~ $ hp user login <my-auth-key>
+halfpipe:~ $ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
 
 Halfpipe session started:
-  Current user:		richard at halfpipe dot sh
+  Current user:		tester1 at halfpipe dot sh
   Authorized until:	Thu, 31 Dec 2020 00:00:00 UTC
   Logout time:		Fri, 10 Jul 2020 11:48:12 UTC (23h59m59s)
 
