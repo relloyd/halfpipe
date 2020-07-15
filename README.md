@@ -67,21 +67,21 @@ Flags:
 Use "hp [command] --help" for more information about a command.
 ```
 
-## Usage & Deployment
+## Usage / Deployment
 
 Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
 
-Choose *one* of these options to get going:
+Choose *__one__* of these options to get going:
 
-A) 
+#### A) Quick Start - Docker Image With Oracle Client Included
 
-Use the [Get Started](#get-started) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure/README.md) script.
+Use the [Quick Start](#quick-start) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure/README.md) script.
 
-B) 
+#### B) Bring You Own Client
 
 Download one of the Release binaries and add it to your target environment. You'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. Run the `configure.sh` script to learn how to set up basic connections.
 
-## Get Started
+## Quick Start
 
 The following steps will walk through option A above to:-
 
@@ -106,17 +106,17 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 ```bash
 # Build and start the Halfpipe Docker image with default AWS_PROFILE=halfpipe...
 
-$ ./start-halfpipe.sh
+./start-halfpipe.sh
 
 # Once you're inside the Docker image, log in using a valid auth key like the 
-# one shown in the command below.
+# one shown here:
 
-$ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
+hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
 
-# Run this script to create connections and set default flag values...
+# Run this script to create connections and set default flag values.
 # Follow the prompts and you're good to go:
 
-$ ./configure.sh -c
+./configure.sh -c
 ```
 
 * `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
@@ -124,8 +124,8 @@ $ ./configure.sh -c
   Use `-h` to see usage and the `-a` flag to override this.
 * The `hp user login` command above is valid for a user called `tester1@halfpipe.sh`. It has privileges required
   to configure Halfpipe and execute core actions like `cp meta`, `cp snap` and `query`. 
-  If you are interested to take more features for a spin, please reach out to me using my [email](#want-to-know-more-or-have-a-feature-request) below.
-  See the [Notes](#notes) below for some security considerations.
+  If you'd like to take more features for a spin, please reach out to me using my [email](#want-to-know-more-or-have-a-feature-request) below.
+  See also the [Notes](#notes) below for some security considerations.
 * `configure.sh -c` requests user input and runs basic set-up to create connections to Oracle, Snowflake and S3. 
   Here's an example [transcript](./demo-svg/configure/README.md). See the help output of [`configure.sh -h`](./demo-svg/configure/README.md#usage-of-configuresh) 
   to learn more about the `hp` commands required to create connections and set default flag values.  
