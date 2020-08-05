@@ -16,7 +16,7 @@ Among other things it supports:
 * Automatic conversion of table metadata DDL
 
 
-## tl;dr Features & Demos
+## TL;DR Features & Demos
 
 ![](./resources/halfpipe-subcommands.gif)
 
