@@ -6,19 +6,19 @@ FROM relloyd/halfpipe-oracle-${ORA_VERSION}-no-oci:${HP_VERSION}
 USER root
 
 RUN apt-get update -y \
-    && apt-get install -y alien curl less vim libaio1 ca-certificates unzip glibc-source groff \
+    && apt-get install -y curl less vim libaio1 ca-certificates unzip glibc-source groff \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
     && ./aws/install \
     && rm awscliv2.zip
 
-# Oracle client
+# Oracle client (use LD_LIBRARY_PATH from parent image).
 
-RUN curl -L https://download.oracle.com/otn_software/linux/instantclient/195000/oracle-instantclient19.5-basiclite-19.5.0.0.0-1.x86_64.rpm -o /tmp/oracle-instantclient.rpm \
-    && for f in /tmp/oracle-*.rpm; do alien -i $f; done \
-    && rm /tmp/oracle-instantclient.rpm
-ENV ORACLE_HOME=/usr/lib/oracle/$ORA_VERSION/client64
-ENV LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/lib/oracle/$ORA_VERSION/client64/lib
+RUN cd /tmp \
+    && curl -L https://download.oracle.com/otn_software/linux/instantclient/19800/instantclient-basiclite-linux.x64-19.8.0.0.0dbru.zip -o instantclient-basiclite-linux.x64-19.8.0.0.0dbru.zip \
+    && for i in instantclient*19.8*.zip; do unzip "$i"; done \
+    && rm instantclient*19.8*.zip \
+    && mv instantclient* /usr/lib/instantclient
 
 # Kubectl
 

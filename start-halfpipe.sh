@@ -3,12 +3,12 @@
 set -e  # exit after any failure
 
 HP_VERSION=2
-ORA_VERSION=19.5
+ORA_VERSION=19.8
 K8S_VERSION=v1.13.1  # include k8s leading 'v'
 
-image_name=halfpipe
 script_dir=`dirname $0`
 build_dir="${script_dir}/image"
+image_name=halfpipe
 image_tag=${HP_VERSION}
 image_already_built=`docker images --filter=reference=${image_name}:${image_tag} -q | wc -l`
 default_port=8080
