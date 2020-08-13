@@ -1,0 +1,27 @@
+ARG HP_VERSION
+ARG ORA_VERSION
+
+FROM relloyd/halfpipe-oracle-${ORA_VERSION}-no-oci:${HP_VERSION} as builder
+
+USER root
+
+# Install the Oracle client (assume LD_LIBRARY_PATH from parent image).
+
+RUN apt-get update -y \
+  && apt-get install -y curl unzip \
+  && cd /tmp \
+  && curl -L https://download.oracle.com/otn_software/linux/instantclient/19800/instantclient-basiclite-linux.x64-19.8.0.0.0dbru.zip -o instantclient-basiclite-linux.x64-19.8.0.0.0dbru.zip \
+  && for i in instantclient*19.8*.zip; do unzip "$i"; done \
+  && rm instantclient*19.8*.zip \
+  && mv instantclient* /usr/lib/instantclient
+
+###############################################################################
+###############################################################################
+
+FROM relloyd/halfpipe-oracle-${ORA_VERSION}-no-oci:${HP_VERSION}
+USER root
+COPY --from=builder /usr/lib/instantclient /usr/lib/instantclient
+RUN apt-get update -y \
+  && apt-get install -y libaio1 ca-certificates
+USER dataops
+WORKDIR /home/dataops
