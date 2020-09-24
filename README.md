@@ -5,7 +5,7 @@ Halfpipe is a command-line utility for streaming data to and from the following 
 1. Oracle
 1. Snowflake
 1. S3 (okay it's not an RDBMS, but it can be a target below)
-1. (Postgres & Teradata support pending <<< let me know if this would be useful to speed up your migrations)
+1. (MSSQL, Postgres & generic ODBC support in progress)
 
 Among other things it supports:
 
