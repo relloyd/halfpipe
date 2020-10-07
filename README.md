@@ -1,13 +1,13 @@
 ## [Halfpipe](https://halfpipe.sh)
 
-Halfpipe is a command-line utility for streaming data to and from the following RDBMS types:
+Halfpipe is a command-line utility for streaming data to and from:
 
 1. Oracle
 1. Snowflake
 1. SQL Server
-1. ODBC (bring your own drivers)
+1. ODBC connections (bring your own database drivers)
 1. S3 (okay it's not an RDBMS, but it can be a source and target below)
-1. (Postgres support is on the roadmap next)
+1. Postgres support is on the roadmap next
 
 It reduces the complexity of common data integration patterns to single commands. 
 
