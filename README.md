@@ -18,6 +18,7 @@ Among other things it supports:
 * Oracle Continuous Query Notifications to stream in real-time
 * HTTP service to start/stop/launch jobs
 * Automatic conversion of table metadata DDL
+* Runs in AWS Lambda
 
 
 ## TL;DR Features & Demos
