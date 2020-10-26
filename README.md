@@ -33,6 +33,7 @@ Among other things it supports:
 * [Stream table changes in real-time](./demo-svg/sync-events/README.md)
 * [Save the config file for a pipe action to run later](./demo-svg/pipes/README.md)
 * [Configure connections to Oracle, Snowflake or S3](./demo-svg/connections/README.md)
+* [Run in AWS Lambda](#12-factor-mode---support-for-serverless-with-aws-lambda)
 
 More [sample commands](#sample-commands) are shown below.
 
@@ -187,6 +188,18 @@ hp config connections -h
 # explore the demos above to see how you can add other connection types...
 # or perform more simple actions to move data quickly.
 ```
+
+## 12 Factor Mode - Support for Serverless With AWS Lambda
+
+Halfpipe is small enough to run in AWS Lambda (~7 MB zipped). 
+
+You can use the main Halfpipe binary `hp` (zipped of course) on its own when connecting between Snowflake, SQL Server and S3, 
+but, if you require Oracle or ODBC connectivity, 
+you'll need to publish a Lambda layer with the Halfpipe plugins (see release binaries) and database drivers (e.g. Oracle OCI).
+
+To get started, you essentially need to create a Lambda with environment variables that mimic existing CLI arguments and flags.
+
+For instructions and sample environment variables, take a look at this blog: https://bit.ly/3ojAcPN  
 
 
 ## Notes
