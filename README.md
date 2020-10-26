@@ -191,11 +191,11 @@ hp config connections -h
 
 ## 12 Factor Mode - Support for Serverless With AWS Lambda
 
-Halfpipe is small enough to run in AWS Lambda (~7 MB zipped). 
+Halfpipe is small enough to run in AWS Lambda. 
 
-You can use the main Halfpipe binary `hp` (zipped of course) on its own when connecting between Snowflake, SQL Server and S3, 
-but, if you require Oracle or ODBC connectivity, 
-you'll need to publish a Lambda layer with the Halfpipe plugins (see release binaries) and database drivers (e.g. Oracle OCI).
+You can use the main Halfpipe binary `hp` (zipped ~7MB) on its own when connecting between Snowflake, SQL Server and S3, 
+but, if you require Oracle or ODBC connectivity, you'll need to publish a Lambda layer with the Halfpipe plugins 
+(see release binaries) and database drivers (e.g. Oracle OCI).
 
 To get started, you essentially need to create a Lambda with environment variables that mimic existing CLI arguments and flags.
 
