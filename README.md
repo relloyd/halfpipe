@@ -13,8 +13,7 @@ It reduces the complexity of common data integration patterns to single commands
 
 Among other things it supports:
 
-* Extracting snapshots periodically
-* Extracting deltas periodically
+* Extracting snapshots and deltas periodically
 * Oracle Continuous Query Notifications to stream in real-time
 * HTTP service to start/stop/launch jobs
 * Automatic conversion of table metadata DDL
@@ -150,8 +149,18 @@ Alternatively head over to https://halfpipe.sh/in-detail/#learn to see a set of 
 # copy a snapshot of all data from Oracle table DIM_TIME to Snowflake via S3...
 hp cp snap oracle.dim_time snowflake.dim_time
 
-# copy a snapshot of all data from Oracle table DIM_TIME to a S3 bucket connection...
+# copy a snapshot of all data from Oracle table DIM_TIME to an S3 bucket connection called demo-data-lake...
 hp cp snap oracle.dim_time demo-data-lake
+
+# copy data files from S3 bucket connection demo-data-lake into Snowflake 
+# by filtering source objects using the regular expression myregexp...
+hp cp snap demo-data-lake.myregexp snowflake.dim_time
+
+# do the same as above, but only for changes that have appeared in S3 since the last time we looked
+# instead of a regexp to filter source objects, this accepts an object name prefix only
+# the object name format is fixed; see the command help for details of the format
+# (SK_DATE is both the primary key and column that drives changes)
+hp cp delta demo-data-lake.dim_time snowlfake.dim_time -p sk_date -d sk_date
 
 # copy changes to Snowflake found in Oracle table DIM_TIME since the last time we looked
 # repeat every hour...
@@ -182,12 +191,13 @@ hp serve
 # configure default flag values to save time having to supply them on the CLI...
 hp config defaults -h
 
-# configure database connections...
+# configure source/target database connections and S3 bucket details...
 hp config connections -h
 
 # explore the demos above to see how you can add other connection types...
 # or perform more simple actions to move data quickly.
 ```
+
 
 ## Support for Serverless With AWS Lambda - 12 Factor Mode
 
@@ -200,6 +210,24 @@ In summary, the post describes how to create a Lambda with environment variables
 You can use the main Halfpipe binary `hp` (zipped ~7 MB) on its own when connecting between Snowflake, SQL Server and S3, 
 but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda layer with the Halfpipe plugins 
 (see release binaries) and database client drivers.
+
+
+## Feature Roadmap
+
+The CLI arguments for Halfpipe essentially use this format, where a logical connection is
+required for each `source` and `target`:
+
+`hp <command> <subcommand> <source>.<object> <target>.<object> [flags]`
+
+The supported types of `source` and `target` connection are as follows, 
+where `Y` shows current functionality and `r` shows a feature on the roadmap:
+
+| `source` ⬇️ `target` ➡️ | Oracle | SQL Server | Postgres | S3  | Snowflake
+| ---           | ---    | ---        | ---      | --- | --- 
+| Oracle        | Y      | r          | r        | Y   | Y 
+| SQL Server    | r      | r          | r        | Y   | Y
+| Postgres      | r      | r          | r        | r   | r
+| S3            | -      | -          | -        | -   | Y
 
 
 ## Notes
