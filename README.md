@@ -199,7 +199,7 @@ hp config connections -h
 ```
 
 
-## Support for Serverless With AWS Lambda - 12 Factor Mode
+## Support for Serverless with AWS Lambda - 12 Factor Mode
 
 Halfpipe is small enough to run in AWS Lambda. 
 
@@ -212,7 +212,7 @@ but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda 
 (see release binaries) and database client drivers.
 
 
-## Feature Roadmap
+## Features Roadmap
 
 The CLI arguments for Halfpipe essentially use this format, where a logical connection is
 required for each `source` and `target`:
