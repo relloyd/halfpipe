@@ -199,7 +199,7 @@ but, if you require Oracle or ODBC connectivity, you'll need to publish a Lambda
 
 To get started, you essentially need to create a Lambda with environment variables that mimic existing CLI arguments and flags.
 
-For instructions and sample environment variables, take a look at this blog: https://bit.ly/3ojAcPN  
+For instructions and sample environment variables, take a look at [this blog](https://halfpipe.sh/blog/07-running-halfpipe-in-aws-lambda/).  
 
 
 ## Notes
