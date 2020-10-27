@@ -2,8 +2,8 @@
 
 Halfpipe is a command-line utility for streaming data to and from:
 
-1. Oracle
 1. Snowflake
+1. Oracle
 1. SQL Server
 1. S3 Buckets
 1. ODBC connections (bring your own database drivers)
@@ -18,7 +18,7 @@ Among other things it supports:
 * Oracle Continuous Query Notifications to stream in real-time
 * HTTP service to start/stop/launch jobs
 * Automatic conversion of table metadata DDL
-* AWS Lambda (for simple productionisation)
+* [AWS Lambda](#12-factor-mode---support-for-serverless-with-aws-lambda) (for simple productionisation)
 
 
 ## TL;DR Features & Demos
