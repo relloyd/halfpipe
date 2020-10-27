@@ -212,7 +212,7 @@ but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda 
 (see release binaries) and database client drivers.
 
 
-## Features Roadmap
+## Features / Roadmap
 
 The CLI arguments for Halfpipe essentially use this format, where a logical connection is
 required for each `source` and `target`:
