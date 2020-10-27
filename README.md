@@ -193,13 +193,13 @@ hp config connections -h
 
 Halfpipe is small enough to run in AWS Lambda. 
 
+To get started, please find a guide to creating a Lambda with sample environment variables on [my blog](https://halfpipe.sh/blog/07-running-halfpipe-in-aws-lambda/). 
+
+In summary, the post describes how to create a Lambda with environment variables that mimic the existing CLI arguments and flags described above.
+
 You can use the main Halfpipe binary `hp` (zipped ~7MB) on its own when connecting between Snowflake, SQL Server and S3, 
-but, if you require Oracle or ODBC connectivity, you'll need to publish a Lambda layer with the Halfpipe plugins 
-(see release binaries) and database drivers (e.g. Oracle OCI).
-
-To get started, you essentially need to create a Lambda with environment variables that mimic existing CLI arguments and flags.
-
-For instructions and sample environment variables, take a look at [this blog](https://halfpipe.sh/blog/07-running-halfpipe-in-aws-lambda/).  
+but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda layer with the Halfpipe plugins 
+(see release binaries) and database client drivers.
 
 
 ## Notes
