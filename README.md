@@ -18,7 +18,7 @@ Among other things it supports:
 * Oracle Continuous Query Notifications to stream in real-time
 * HTTP service to start/stop/launch jobs
 * Automatic conversion of table metadata DDL
-* [AWS Lambda](#12-factor-mode---support-for-serverless-with-aws-lambda) (for simple productionisation)
+* [AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode) (for simple productionisation)
 
 
 ## TL;DR Features & Demos
@@ -33,7 +33,7 @@ Among other things it supports:
 * [Stream table changes in real-time](./demo-svg/sync-events/README.md)
 * [Save the config file for a pipe action to run later](./demo-svg/pipes/README.md)
 * [Configure connections to Oracle, Snowflake or S3](./demo-svg/connections/README.md)
-* [Run in AWS Lambda](#12-factor-mode---support-for-serverless-with-aws-lambda)
+* [Run in AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode)
 
 More [sample commands](#sample-commands) are shown below.
 
@@ -133,7 +133,7 @@ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
   to configure Halfpipe and execute core actions like `cp meta`, `cp snap` and `query`. 
   If you'd like to take more features for a spin, please reach out to me using my [email](#want-to-know-more-or-have-a-feature-request) below.
   See also the [Notes](#notes) below for some security considerations.
-* `configure.sh -c` requests user input and runs basic set-up to create connections to Oracle, Snowflake and S3. 
+* `configure.sh -c` requests user input and runs the basic set-up to create connections to Oracle, Snowflake and S3. 
   Here's an example [transcript](./demo-svg/configure/README.md). See the help output of [`configure.sh -h`](./demo-svg/configure/README.md#usage-of-configuresh) 
   to learn more about the `hp` commands required to create connections and set default flag values.  
 
@@ -144,7 +144,7 @@ Once you have connections setup, it's as simple as a single command to copy data
 
 Here are a few sample actions - the demos above cover them all in more detail.
 
-Alternatively head over to https://halfpipe.sh/in-detail/#learn to see a set of short videos that explain some of the features. 
+Alternatively head over to https://halfpipe.sh/in-detail/#learn to see a set of short videos that explain the features. 
 
 ```bash
 # copy a snapshot of all data from Oracle table DIM_TIME to Snowflake via S3...
@@ -189,7 +189,7 @@ hp config connections -h
 # or perform more simple actions to move data quickly.
 ```
 
-## 12 Factor Mode - Support for Serverless With AWS Lambda
+## Support for Serverless With AWS Lambda - 12 Factor Mode
 
 Halfpipe is small enough to run in AWS Lambda. 
 
@@ -197,7 +197,7 @@ To get started, please find a guide to creating a Lambda with sample environment
 
 In summary, the post describes how to create a Lambda with environment variables that mimic the existing CLI arguments and flags described above.
 
-You can use the main Halfpipe binary `hp` (zipped ~7MB) on its own when connecting between Snowflake, SQL Server and S3, 
+You can use the main Halfpipe binary `hp` (zipped ~7 MB) on its own when connecting between Snowflake, SQL Server and S3, 
 but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda layer with the Halfpipe plugins 
 (see release binaries) and database client drivers.
 
