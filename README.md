@@ -9,9 +9,8 @@ Halfpipe is a command-line utility for streaming data to and from:
 1. ODBC connections (bring your own database drivers)
 1. Postgres support is on the roadmap next
 
-It reduces the complexity of common data integration patterns to single commands that run the same on your workstations as they do in production. 
-
-Among other things it supports:
+It reduces the complexity of common data integration patterns to single commands that run the same on your workstations 
+as they do in production. Among other things it supports:
 
 * Extracting snapshots and deltas periodically
 * Oracle Continuous Query Notifications to stream in real-time
@@ -20,7 +19,7 @@ Among other things it supports:
 * [AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode) (for simple productionisation)
 
 
-## TL;DR Features & Demos
+## Features & Demos
 
 ![](./resources/halfpipe-subcommands.gif)
 
@@ -85,6 +84,7 @@ Use the [Quick Start](#quick-start) instructions below to build a local Docker i
 #### B) Bring You Own Client
 
 Download one of the Release binaries and add it to your target environment. Copy the plugins to `/usr/local/lib` to get started. If you don't want Oracle or ODBC functionality you should be good to just use the `hp` standalone binary. If you want Oracle functionality via the Oracle plugin, you'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable is set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. The ODBC plugin requires unixODBC libraries. Run the `configure.sh` script to learn how to set up basic connections.
+
 
 ## Quick Start
 
