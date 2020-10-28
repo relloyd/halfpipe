@@ -2,7 +2,7 @@
 
 set -e  # exit after any failure
 
-HP_VERSION=v0.1.5
+HP_VERSION=v0.1.6
 ORA_VERSION=19.8
 
 script_dir=$(dirname "$0")
