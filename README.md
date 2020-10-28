@@ -223,11 +223,11 @@ The supported types of `source` and `target` connection are as follows,
 where `Y` shows current functionality and `r` shows a feature on the roadmap:
 
 | `source` ⬇️ `target` ➡️ | Oracle | SQL Server | Postgres | S3  | Snowflake
-| ---           | ---    | ---        | ---      | --- | --- 
-| Oracle        | Y      | r          | r        | Y   | Y 
-| SQL Server    | r      | r          | r        | Y   | Y
-| Postgres      | r      | r          | r        | r   | r
-| S3            | -      | -          | -        | -   | Y
+| ---                      | ---    | ---        | ---      | --- | --- 
+| Oracle                   | Y      | r          | r        | Y   | Y 
+| SQL Server               | r      | r          | r        | Y   | Y
+| Postgres                 | r      | r          | r        | r   | r
+| S3                       | -      | -          | -        | -   | Y
 
 
 ## Notes
