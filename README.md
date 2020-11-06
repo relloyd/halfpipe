@@ -212,7 +212,7 @@ but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda 
 (see release binaries) and database client drivers.
 
 
-## Features / Roadmap
+## Features
 
 The CLI arguments for Halfpipe essentially use this format, where a logical connection is
 required for each `source` and `target`:
@@ -222,14 +222,17 @@ required for each `source` and `target`:
 The supported types of `source` and `target` connection are as follows, 
 where `Y` shows current functionality and `r` shows a feature on the roadmap:
 
-| `source` ⬇️ `target` ➡️ | Oracle | SQL Server | Postgres | S3  | Snowflake
+| ⬇️ `source` ➡️ `target` | Oracle | SQL Server | Postgres | S3  | Snowflake
 | ---                      | ---    | ---        | ---      | --- | --- 
 | Oracle                   | Y      | r          | r        | Y   | Y 
 | SQL Server               | r      | r          | r        | Y   | Y
 | Postgres                 | r      | r          | r        | r   | r
 | S3                       | -      | -          | -        | -   | Y
 
-Some other items on the roadmap are:
+
+## Roadmap
+
+Some of the items on the roadmap include:
 
 * Oracle Change Data Capture (CDC) support using [OpenLogReplicator](https://github.com/bersler/OpenLogReplicator)
 * PostgreSQL connectivity
