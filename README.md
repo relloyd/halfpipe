@@ -23,7 +23,7 @@ as they do in production. Among other things it supports:
 * Oracle Continuous Query Notifications to stream in real-time
 * HTTP service to start/stop/launch jobs
 * Automatic conversion of table metadata DDL
-* [AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode) (for simple productionisation)
+* [Serverless](#support-for-serverless-with-aws-lambda---12-factor-mode), for simple productionisation in AWS Lambda
 
 
 ## Feature Demos
