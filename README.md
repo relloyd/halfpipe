@@ -245,13 +245,12 @@ where `Y` shows current functionality and `r` shows a feature on the roadmap:
 
 Some items on the roadmap include:
 
-* Oracle Change Data Capture (CDC) support using [OpenLogReplicator](https://github.com/bersler/OpenLogReplicator)
-* PostgreSQL connectivity
-* AWS Marketplace, AMIs for easy deployment
-* Kafka and Kinesis streaming input/outputs
-* A user interface to manage the `hp serve` micro-service
-* Cluster-aware micro-service
 * Support for Snowflake in Azure and GCP 
+* Oracle Change Data Capture (CDC) plugin
+* More database connectors (Postgres, Teradata, ...)
+* AWS Marketplace
+* Kafka and Kinesis streaming input/output
+* User interface to manage the `hp serve` micro-service
 
 Please [get in touch](#want-to-know-more-or-have-a-feature-request) if any of these stand out as being important to you.
 
