@@ -1,8 +1,8 @@
 # Halfpipe
 
-[Introduction](#introduction) | [Demos](#features--demos) | [Usage / Deployment](#usage--deployment) | [Quick Start](#quick-start) | 
+[Introduction](#introduction) | [Demos](#features--demos) | [Usage](#usage--deployment) | [Deployment](#usage--deployment) | [Quick Start](#quick-start) | 
 [Sample Commands](#sample-commands) | [Serverless Support](#support-for-serverless-with-aws-lambda---12-factor-mode) | 
-[Features Matrix](#features) | [Roadmap](#roadmap) | [Notes](#notes) | [Limitations](#limitations) | [How To Get In Touch](#want-to-know-more-or-have-a-feature-request)
+[Features Matrix](#features) | [Roadmap](#roadmap) | [Notes](#notes) | [Limitations](#limitations) | [Contact](#want-to-know-more-or-have-a-feature-request)
 
 
 ## Introduction
@@ -14,7 +14,7 @@ Halfpipe is a command-line utility for streaming data to and from:
 1. SQL Server
 1. S3 Buckets
 1. ODBC connections (bring your own database drivers)
-1. Postgres support is on the roadmap next
+1. Postgres support is on the [roadmap](#roadmap)
 
 It reduces the complexity of common data integration patterns to single commands that run the same on your workstations 
 as they do in production. Among other things it supports:
