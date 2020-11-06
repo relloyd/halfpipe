@@ -1,6 +1,6 @@
 # Halfpipe
 
-[Introduction](#introduction) | [Demos](#features--demos) | [Usage](#usage--deployment) | [Deployment](#usage--deployment) | [Quick Start](#quick-start) | 
+[Introduction](#introduction) | [Feature Demos](#feature-demos) | [Usage](#usage) | [Deployment](#deployment) | [Quick Start](#quick-start) | 
 [Sample Commands](#sample-commands) | [Serverless Support](#support-for-serverless-with-aws-lambda---12-factor-mode) | 
 [Features Matrix](#features) | [Roadmap](#roadmap) | [Notes](#notes) | [Limitations](#limitations) | [Contact](#want-to-know-more-or-have-a-feature-request)
 
@@ -26,7 +26,7 @@ as they do in production. Among other things it supports:
 * [AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode) (for simple productionisation)
 
 
-## Features & Demos
+## Feature Demos
 
 ![](./resources/halfpipe-subcommands.gif)
 
@@ -41,6 +41,8 @@ as they do in production. Among other things it supports:
 * [Run in AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode)
 
 More [sample commands](#sample-commands) are shown below.
+
+## Usage 
 
 ```
 $ hp
@@ -78,7 +80,7 @@ Flags:
 Use "hp [command] --help" for more information about a command.
 ```
 
-## Usage / Deployment
+## Deployment
 
 Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
 
