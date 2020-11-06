@@ -229,6 +229,18 @@ where `Y` shows current functionality and `r` shows a feature on the roadmap:
 | Postgres                 | r      | r          | r        | r   | r
 | S3                       | -      | -          | -        | -   | Y
 
+Some other items on the roadmap are:
+
+* Oracle Change Data Capture (CDC) support using [OpenLogReplicator](https://github.com/bersler/OpenLogReplicator)
+* PostgreSQL connectivity
+* AWS Marketplace, AMIs for easy deployment
+* Kafka and Kinesis streaming input/outputs
+* A user interface to manage the `hp serve` micro-service
+* Cluster-aware micro-service
+* Support for Snowflake in Azure and GCP 
+
+Please [get in touch](#want-to-know-more-or-have-a-feature-request) if any of these stand out as being important to you.
+
 
 ## Notes
 
@@ -267,4 +279,6 @@ I'd welcome your feedback.
 
 Visit my website over at [halfpipe.sh](https://halfpipe.sh)
 
-Get in touch by raising an issue above or email me directly at `richard at halfpipe dot sh`
+Get in touch by raising an issue above or via my website contact page. 
+
+You can also email me directly at `richard at halfpipe dot sh`
