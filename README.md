@@ -97,12 +97,12 @@ Download one of the Release binaries and add it to your target environment. Copy
 
 ## Quick Start
 
-The following steps will walk through option A above to:-
+The following [steps](#steps) will walk through option A above to:-
 
-1. build a local Docker image containing Halfpipe and Oracle client drivers
-1. add connections for an Oracle database, Snowflake and S3
-1. create a Snowflake external stage compatible with Halfpipe
-1. set default flag values for the `hp` CLI
+* build a local Docker image containing Halfpipe and Oracle client drivers
+* add connections for an Oracle database, Snowflake and S3
+* create a Snowflake external stage compatible with Halfpipe
+* set default flag values for the `hp` CLI
 
 After this, you'll be ready to use the example commands shown [below](#sample-commands) or in the [tl;dr section](#feature-demos) above. 
 
@@ -133,6 +133,8 @@ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
 
 ./configure.sh -c
 ```
+
+where: 
 
 * `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
   By default, it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
