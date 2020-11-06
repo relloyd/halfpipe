@@ -246,7 +246,7 @@ where `Y` shows current functionality and `r` shows a feature on the roadmap:
 Some items on the roadmap include:
 
 * Support for Snowflake in Azure and GCP 
-* Oracle Change Data Capture (CDC) plugin
+* Oracle Change Data Capture (CDC)
 * More database connectors (Postgres, Teradata, ...)
 * AWS Marketplace
 * Kafka and Kinesis streaming input/output
