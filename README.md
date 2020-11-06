@@ -92,7 +92,7 @@ Use the [Quick Start](#quick-start) instructions below to build a local Docker i
 
 #### B) Bring You Own Client
 
-Download one of the Release binaries and add it to your target environment. Copy the plugins to `/usr/local/lib` to get started. If you don't want Oracle or ODBC functionality you should be good to just use the `hp` standalone binary. If you want Oracle functionality via the Oracle plugin, you'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable is set and the OCI library is accessible.  If you follow Oracle's Instant Client set-up instructions and check that SQL*Plus works, you should be good to go. The ODBC plugin requires unixODBC libraries. Run the `configure.sh` script to learn how to set up basic connections.
+Download one of the Release binaries and add it to your target environment. Copy the plugins to `/usr/local/lib` to get started. If you don't want Oracle or ODBC functionality you should be good to just use the `hp` standalone binary. If you want Oracle functionality via the Oracle plugin, you'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable is set and the OCI library is accessible.  Follow Oracle's Instant Client set-up instructions and check SQL*Plus works then you should be good to go. The ODBC plugin requires unixODBC libraries. Run the `configure.sh` script to learn how to set up basic connections.
 
 
 ## Quick Start
@@ -104,7 +104,7 @@ The following steps will walk through option A above to:-
 1. create a Snowflake external stage compatible with Halfpipe
 1. set default flag values for the `hp` CLI
 
-After this, you'll be ready to use the example commands shown [below](#sample-commands) or in the [tl;dr section](#tldr-features--demos) above. 
+After this, you'll be ready to use the example commands shown [below](#sample-commands) or in the [tl;dr section](#feature-demos) above. 
 
 Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) if you run into any issues. Happy munging! 😄  
 
@@ -135,7 +135,7 @@ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
 ```
 
 * `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
-  By default it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
+  By default, it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
   Use `-h` to see usage and the `-a` flag to override this.
 * The `hp user login` command above is valid for a user called `tester1@halfpipe.sh`. It has privileges required
   to configure Halfpipe and execute core actions like `cp meta`, `cp snap` and `query`. 
@@ -241,7 +241,7 @@ where `Y` shows current functionality and `r` shows a feature on the roadmap:
 
 ## Roadmap
 
-Some of the items on the roadmap include:
+Some items on the roadmap include:
 
 * Oracle Change Data Capture (CDC) support using [OpenLogReplicator](https://github.com/bersler/OpenLogReplicator)
 * PostgreSQL connectivity
