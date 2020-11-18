@@ -38,7 +38,7 @@ as they do in production. Among other things it supports:
 * [Stream table changes in real-time](./demo-svg/sync-events/README.md)
 * [Validate table data (compare data and produce a diff report)](./demo-svg/diff/README.md)
 * [Save the config file for a pipe action to run later](./demo-svg/pipes/README.md)
-* [Configure connections to Oracle, Snowflake or S3](./demo-svg/connections/README.md)
+* [Configure connections](./demo-svg/connections/README.md)
 * [Run in AWS Lambda](#support-for-serverless-with-aws-lambda---12-factor-mode)
 
 More [sample commands](#sample-commands) are shown below.
