@@ -56,7 +56,7 @@ $ hp
 Halfpipe is a DataOps utility for streaming data. It's designed to be light-weight and easy to use.
 Use command-line switches for pre-canned actions or write your own pipes in YAML or JSON to sync
 data in near real-time. Start an HTTP server to expose functionality via a RESTful API.
-Half-Pipe is not yet cluster-aware but it scales out. Start multiple instances of this tool and
+Halfpipe is not yet cluster-aware but it scales out. Start multiple instances of this tool and
 off you go. Happy munging! 😄
 
 Usage:
@@ -66,6 +66,7 @@ Available Commands:
   config      Configure connections and default flag values
   cp          Copy snapshots, deltas or metadata from source objects to target
   create      Generate helpful metadata
+  diff        Compare table data and report differences between source and target
   pipe        Execute a transform described in a YAML or JSON file
   query       Run a SQL query against a configured connection
   serve       Start a web service and listen for pipe commands described in JSON
