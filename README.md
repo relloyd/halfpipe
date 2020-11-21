@@ -88,11 +88,11 @@ Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 I
 
 Choose *__one__* of these options to get going:
 
-#### A) Quick Start - Docker Image With Oracle Client Included
+#### A) Quick Start - Docker Image With Oracle Drivers Included
 
 Use the [Quick Start](#quick-start) instructions below to build a local Docker image that contains the Halfpipe CLI and the Oracle client drivers. This is the easy option that drops you into a command prompt ready to use the `hp` tool or the [`configure.sh`](demo-svg/configure/README.md) script.
 
-#### B) Bring You Own Client
+#### B) Bring You Own Oracle Drivers
 
 Download one of the Release binaries and add it to your target environment. Copy the plugins to `/usr/local/lib` to get started. If you don't want Oracle or ODBC functionality you should be good to just use the `hp` standalone binary. If you want Oracle functionality via the Oracle plugin, you'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable is set and the OCI library is accessible.  Follow Oracle's Instant Client set-up instructions and check SQL*Plus works then you should be good to go. The ODBC plugin requires unixODBC libraries. Run the [`configure.sh`](demo-svg/configure/README.md) script to learn how to set up basic connections.
 
