@@ -2,7 +2,8 @@
 
 [Introduction](#introduction) | [Feature Demos](#feature-demos) | [Usage](#usage) | [Deployment](#deployment) | [Quick Start](#quick-start) | 
 [Sample Commands](#sample-commands) | [Serverless Support](#support-for-serverless-with-aws-lambda---12-factor-mode) | 
-[Features Matrix](#features) | [Roadmap](#roadmap) | [Notes](#notes) | [Limitations](#limitations) | [Contact](#want-to-know-more-or-have-a-feature-request)
+[Features Matrix](#features) | [Roadmap](#roadmap) | [Running In Production](#production) | [Notes](#notes) | 
+[Limitations](#limitations) | [Contact](#want-to-know-more-or-have-a-feature-request) 
 
 
 ## Introduction
@@ -256,6 +257,12 @@ Some items on the roadmap include:
 
 Please [get in touch](#want-to-know-more-or-have-a-feature-request) if any of these stand out as being important to you.
 
+## Production
+
+To help fund and support this project, I've published an AWS machine image, with hourly billing and free trial available for you to get started.
+Please take a look on the marketplace [here](https://aws.amazon.com/marketplace/pp/B08PL1STFS?qid=1610988617064&sr=0-1&ref_=srh_res_product_title).
+There's no minimum commitment so it's easy to take it for a spin.
+Let me know your thoughts any time as I really appreciate your feedback!
 
 ## Notes
 
