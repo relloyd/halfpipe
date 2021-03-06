@@ -4,7 +4,7 @@ Here's an animation of the Halfpipe CLI being started in a Docker image using sc
 
 The video shows how easy it is to set up Halfpipe with connections to Oracle, Snowflake and S3 - using script [`configure.sh`](#usage-of-configuresh) (added to the image).
  
-The [original video](https://www.loom.com/share/a6a2743443f1480db50040e70aafe1f0) (with audio) is available on Loom.   
+The [original video](https://www.loom.com/share/ae65e58ecbcd4ca3a9f0b144e94522a9) (with audio) is available on Loom.   
 
 ![](./halfpipe-setup.gif)
 
