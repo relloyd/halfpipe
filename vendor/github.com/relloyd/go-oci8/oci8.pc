@@ -1,0 +1,8 @@
+includedir=/usr/local/oracle/instantclient-12201/sdk/include
+libdir=/usr/local/oracle/instantclient-12201/sdk
+
+Name: oci8
+Description: Oracle Instant Client
+Version: 19.5
+Cflags: -I${includedir}
+Libs: -L${libdir} -lclntsh
