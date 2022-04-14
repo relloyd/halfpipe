@@ -1,0 +1,6 @@
+This is a Halfpipe shared library plugin providing connectivity to ODBC databases via unixODBC library.
+
+See also directory "plugin-loader".
+
+20200913 - Go 1.15.1 - All function seem to be required in main.go and are not included in the build if they live
+in another file. Perhaps my compilation switches need updating!?!

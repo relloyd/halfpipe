@@ -1,0 +1,12 @@
+libdir=/usr/lib/instantclient
+includedir=/usr/lib/instantclient/sdk/include
+
+glib_genmarshal=glib-genmarshal
+gobject_query=gobject-query
+glib_mkenums=glib-mkenums
+
+Name: oci8
+Description: oci8 library
+Libs: -L${libdir} -lclntsh
+Cflags: -I${includedir}
+Version: 19.8

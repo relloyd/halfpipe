@@ -1,0 +1,133 @@
+package actions
+
+import (
+	"github.com/pkg/errors"
+	"github.com/relloyd/halfpipe/constants"
+	"github.com/relloyd/halfpipe/rdbms/shared"
+	tabledefinition "github.com/relloyd/halfpipe/table-definition"
+
+	"strconv"
+
+	"github.com/relloyd/halfpipe/helper"
+	"github.com/relloyd/halfpipe/logger"
+	"github.com/relloyd/halfpipe/rdbms"
+	"github.com/relloyd/halfpipe/transform"
+)
+
+type OraOraSnapConfig struct {
+	SourceConnection  string `errorTxt:"source <connection>" mandatory:"yes"`
+	TargetConnection  string `errorTxt:"target <connection>" mandatory:"yes"`
+	SrcOraSchemaTable rdbms.SchemaTable
+	TgtOraSchemaTable rdbms.SchemaTable
+	SrcConnDetails    *shared.ConnectionDetails
+	TgtConnDetails    *shared.ConnectionDetails
+	// Richard 2020021 - commented old specific config:
+	// SrcOraConnDetails         shared.OracleConnectionDetails
+	// TgtOraConnDetails         shared.OracleConnectionDetails
+	AppendTarget              bool
+	CommitBatchSize           string
+	RepeatInterval            int `errorTxt:"repeat interval"`
+	ExportConfigType          string
+	ExportIncludeConnections  bool
+	LogLevel                  string `errorTxt:"log level" mandatory:"yes"`
+	StackDumpOnPanic          bool
+	StatsDumpFrequencySeconds int
+}
+
+// SetupCpOraOraSnap copies values from genericCfg to actionCfg ready for Oracle to Oracle snapshot action.
+func SetupCpOraOraSnap(genericCfg interface{}, actionCfg interface{}) error {
+	src := genericCfg.(*CpConfig)
+	tgt := actionCfg.(*OraOraSnapConfig)
+	var err error
+	// Setup real connection details into tgt struct.
+	if tgt.SrcConnDetails, err = src.Connections.GetConnectionDetails(src.SourceString.GetConnectionName()); err != nil {
+		return err
+	}
+	if tgt.TgtConnDetails, err = src.Connections.GetConnectionDetails(src.TargetString.GetConnectionName()); err != nil {
+		return err
+	}
+	// General
+	tgt.StackDumpOnPanic = src.StackDumpOnPanic
+	tgt.StatsDumpFrequencySeconds = src.StatsDumpFrequencySeconds
+	tgt.LogLevel = src.LogLevel
+	tgt.ExportConfigType = src.ExportConfigType
+	tgt.ExportIncludeConnections = src.ExportIncludeConnections
+	tgt.RepeatInterval = src.RepeatInterval
+	tgt.CommitBatchSize = src.CommitBatchSize
+	// Source
+	tgt.SourceConnection = src.SourceString.GetConnectionName()
+	tgt.SrcOraSchemaTable.SchemaTable = src.SourceString.GetObject()
+	// Target
+	tgt.TargetConnection = src.TargetString.GetConnectionName()
+	tgt.TgtOraSchemaTable.SchemaTable = src.TargetString.GetObject()
+	tgt.AppendTarget = src.AppendTarget
+	return nil
+}
+
+func RunOracleOracleSnapshot(cfg interface{}) error {
+	cfgSnap := cfg.(*OraOraSnapConfig)
+	// Setup logging.
+	if cfgSnap.ExportConfigType != "" { // if the user wants the transform on STDOUT...
+		cfgSnap.LogLevel = "error"
+	}
+	log := logger.NewLogger("halfpipe", cfgSnap.LogLevel, cfgSnap.StackDumpOnPanic)
+	// Validate switches.
+	if err := helper.ValidateStructIsPopulated(cfgSnap); err != nil {
+		return err
+	}
+	// Get column list for input SQL and optionally the CSV header fields.
+	tableCols, err := tabledefinition.GetTableColumns(log, tabledefinition.GetColumnsFunc(cfgSnap.SrcConnDetails), &cfgSnap.SrcOraSchemaTable)
+	if err != nil {
+		return err
+	}
+	colList := helper.StringsToCsv(tableCols)
+	// Get specific connections.
+	connSrc := shared.GetDsnConnectionDetails(cfgSnap.SrcConnDetails)
+	connTgt := shared.GetDsnConnectionDetails(cfgSnap.TgtConnDetails)
+	// Set up the transform.
+	m := make(map[string]string)
+	m["${sleepSeconds}"] = strconv.Itoa(cfgSnap.RepeatInterval)
+	if cfgSnap.RepeatInterval > 0 { // if there is a repeat interval...
+		m["${repeatTransform}"] = transform.TransformRepeating // set the loop interval to repeat the transform.
+	} else { // else we should execute this transform once...
+		m["${repeatTransform}"] = transform.TransformOnce
+	}
+	// Source
+	m["${sourceLogicalName}"] = cfgSnap.SourceConnection
+	m["${sourceDsn}"] = connSrc.Dsn
+	m["${sourceTable}"] = cfgSnap.SrcOraSchemaTable.SchemaTable
+	m["${columnListCsv}"] = helper.EscapeQuotesInString(colList)
+	// Target
+	m["${targetLogicalName}"] = cfgSnap.TargetConnection
+	m["${targetDsn}"] = connTgt.Dsn
+	m["${targetSchema}"] = cfgSnap.TgtOraSchemaTable.GetSchema()
+	m["${targetTable}"] = cfgSnap.TgtOraSchemaTable.GetTable()
+	m["${targetBatchSize}"] = cfgSnap.CommitBatchSize
+	m["${MergeDiffValueNew}"] = constants.MergeDiffValueNew
+	// Generate rows
+	if cfgSnap.AppendTarget {
+		m["${truncateTargetEnabled1orDisabled0}"] = "0"
+	} else {
+		m["${truncateTargetEnabled1orDisabled0}"] = "1"
+	}
+
+	// Columns for tableSync
+	pkTokens, err := helper.OrderedMapToTokens(helper.StringSliceToOrderedMap(tableCols), true)
+	if err != nil {
+		return err
+	}
+	m["${targetKeyColumns}"] = pkTokens
+	mustReplaceInStringUsingMapKeyVals(&jsonOracleOracleSnapshot, m)
+	log.Debug("replaced reference JSON for snapshot ", jsonOracleOracleSnapshot)
+	// Execute or export the transform.
+	if cfgSnap.ExportConfigType == "" { // if we should execute the transform...
+		ti := transform.NewSafeMapTransformInfo()
+		_, err := transform.LaunchTransformJson(log, ti, jsonOracleOracleSnapshot, true, cfgSnap.StatsDumpFrequencySeconds)
+		if err != nil {
+			return errors.Wrap(err, "unable to unmarshal reference JSON to build the Oracle snapshot pipe")
+		}
+	} else { // else we should write the transform to STDOUT...
+		return outputPipeDefinition(log, jsonOracleOracleSnapshot, cfgSnap.ExportConfigType, cfgSnap.ExportIncludeConnections)
+	}
+	return nil
+}

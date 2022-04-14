@@ -1,0 +1,159 @@
+package actions
+
+import (
+	"fmt"
+	"strconv"
+
+	"github.com/pkg/errors"
+	"github.com/relloyd/halfpipe/helper"
+	"github.com/relloyd/halfpipe/logger"
+	"github.com/relloyd/halfpipe/rdbms"
+	"github.com/relloyd/halfpipe/rdbms/shared"
+	td "github.com/relloyd/halfpipe/table-definition"
+	"github.com/relloyd/halfpipe/transform"
+)
+
+type OraOraDeltaConfig struct {
+	SourceConnection  string `errorTxt:"source <connection>" mandatory:"yes"`
+	TargetConnection  string `errorTxt:"target <connection>" mandatory:"yes"`
+	SrcOraSchemaTable rdbms.SchemaTable
+	TgtOraSchemaTable rdbms.SchemaTable
+	SrcConnDetails    *shared.ConnectionDetails
+	TgtConnDetails    *shared.ConnectionDetails
+	// Richard 2020021 - commented old specific config:
+	// TgtOraConnDetails shared.OracleConnectionDetails
+	// SrcOraConnDetails shared.OracleConnectionDetails
+	CommitBatchSize string
+	ExecBatchSize   string
+	// General
+	RepeatInterval            int `errorTxt:"repeat interval"`
+	ExportConfigType          string
+	ExportIncludeConnections  bool
+	LogLevel                  string `errorTxt:"log level" mandatory:"yes"`
+	StackDumpOnPanic          bool
+	StatsDumpFrequencySeconds int
+	// Delta
+	SQLPrimaryKeyFieldsCsv string `errorTxt:"primary key fields CSV" mandatory:"yes"`
+	SQLBatchDriverField    string `errorTxt:"source driver field" mandatory:"yes"`
+	SQLBatchStartSequence  string `errorTxt:"SQL batch start sequence (number)" mandatory:"yes"`
+	SQLBatchStartDateTime  string `errorTxt:"SQL batch start date-time" mandatory:"yes"`
+	// Richard 20191010 - batch size days and seconds not used for oracle-oracle since we order by rows anyway.
+	// SQLBatchSizeSeconds    string `errorTxt:"SQL batch size seconds"`
+	// SQLBatchSize           string `errorTxt:"SQL batch size"`
+}
+
+// SetupCpOraOraSnap copies values from genericCfg to actionCfg ready for Oracle to Oracle snapshot action.
+func SetupCpOraOraDelta(genericCfg interface{}, actionCfg interface{}) error {
+	src := genericCfg.(*CpConfig)
+	tgt := actionCfg.(*OraOraDeltaConfig)
+	var err error
+	// Setup real connection details.
+	if tgt.SrcConnDetails, err = src.Connections.GetConnectionDetails(src.SourceString.GetConnectionName()); err != nil {
+		return err
+	}
+	if tgt.TgtConnDetails, err = src.Connections.GetConnectionDetails(src.TargetString.GetConnectionName()); err != nil {
+		return err
+	}
+	// General
+	tgt.StackDumpOnPanic = src.StackDumpOnPanic
+	tgt.StatsDumpFrequencySeconds = src.StatsDumpFrequencySeconds
+	tgt.LogLevel = src.LogLevel
+	tgt.ExportConfigType = src.ExportConfigType
+	tgt.ExportIncludeConnections = src.ExportIncludeConnections
+	tgt.RepeatInterval = src.RepeatInterval
+	tgt.CommitBatchSize = src.CommitBatchSize
+	tgt.ExecBatchSize = src.ExecBatchSize
+	// Source
+	tgt.SourceConnection = src.SourceString.GetConnectionName()
+	tgt.SrcOraSchemaTable.SchemaTable = src.SourceString.GetObject()
+	// Target
+	tgt.TargetConnection = src.TargetString.GetConnectionName()
+	tgt.TgtOraSchemaTable.SchemaTable = src.TargetString.GetObject()
+	// Delta specific
+	tgt.SQLPrimaryKeyFieldsCsv = src.SQLPrimaryKeyFieldsCsv
+	tgt.SQLBatchDriverField = src.SQLBatchDriverField
+	tgt.SQLBatchStartSequence = strconv.Itoa(src.SQLBatchStartSequence)
+	tgt.SQLBatchStartDateTime = src.SQLBatchStartDateTime
+	// Richard 20191010 - batch size days and seconds not used for oracle-oracle since we order by rows anyway.
+	// tgt.SQLBatchSize = src.SQLBatchSize
+	// tgt.SQLBatchSizeSeconds = src.SQLBatchSizeSeconds
+	return nil
+}
+
+func RunOracleOracleDelta(cfg interface{}) error {
+	cfgDelta := cfg.(*OraOraDeltaConfig)
+	// Setup logging.
+	if cfgDelta.ExportConfigType != "" { // if the user wants the transform on STDOUT...
+		cfgDelta.LogLevel = "error"
+	}
+	log := logger.NewLogger("halfpipe", cfgDelta.LogLevel, cfgDelta.StackDumpOnPanic)
+	// Validate switches.
+	if err := helper.ValidateStructIsPopulated(cfgDelta); err != nil {
+		return err
+	}
+	// Get column list for input SQL and optionally the CSV header fields.
+	tableCols, err := td.GetTableColumns(log, td.GetColumnsFunc(cfgDelta.SrcConnDetails), &cfgDelta.SrcOraSchemaTable)
+	if err != nil {
+		return err
+	}
+	// Check data type of driver field.
+	deltaDriverDataType, err := td.ColumnIsNumberOrDate(log, td.GetColumnsFunc(cfgDelta.SrcConnDetails), td.MustGetMapper(cfgDelta.SrcConnDetails), &cfgDelta.SrcOraSchemaTable, cfgDelta.SQLBatchDriverField)
+	if err != nil {
+		return err
+	}
+	pkTokens, otherTokens, err := getKeysAndOtherColumns(cfgDelta.SQLPrimaryKeyFieldsCsv, tableCols)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("some of the supplied fields are not present in table/view %q", cfgDelta.SrcOraSchemaTable.SchemaTable))
+	}
+	// Get specific connections.
+	connSrc := shared.GetDsnConnectionDetails(cfgDelta.SrcConnDetails)
+	connTgt := shared.GetDsnConnectionDetails(cfgDelta.TgtConnDetails)
+	// Set up the transform.
+	var jsonPipe *string
+	m := make(map[string]string)
+	m["${sleepSeconds}"] = strconv.Itoa(cfgDelta.RepeatInterval)
+	if cfgDelta.RepeatInterval > 0 { // if there is a repeat interval...
+		m["${repeatTransform}"] = transform.TransformRepeating // set the loop interval to repeat the transform.
+	} else { // else we should execute this transform once...
+		m["${repeatTransform}"] = transform.TransformOnce
+	}
+	// Source
+	m["${sourceLogicalName}"] = cfgDelta.SourceConnection
+	m["${sourceDsn}"] = connSrc.Dsn
+	m["${sourceTable}"] = cfgDelta.SrcOraSchemaTable.SchemaTable
+	m["${columnListCsv}"] = helper.EscapeQuotesInString(helper.StringsToCsv(tableCols))
+	// Target
+	m["${targetLogicalName}"] = cfgDelta.TargetConnection
+	m["${targetDsn}"] = connTgt.Dsn
+	m["${targetSchema}"] = cfgDelta.TgtOraSchemaTable.GetSchema()
+	m["${targetTable}"] = cfgDelta.TgtOraSchemaTable.GetTable()
+	// Delta specific
+	m["${SQLBatchDriverField}"] = cfgDelta.SQLBatchDriverField
+	if deltaDriverDataType == 0 { // if the field is of type NUMBER...
+		m["${SQLBatchStartSequence}"] = cfgDelta.SQLBatchStartSequence
+		jsonPipe = &jsonOracleOracleDeltaNumber
+	} else if deltaDriverDataType == 1 { // else if the field is DATE or TIMESTAMP...
+		m["${SQLBatchStartDateTime}"] = cfgDelta.SQLBatchStartDateTime
+		jsonPipe = &jsonOracleOracleDeltaDate
+	} else {
+		return fmt.Errorf("unexpected data type found for delta driver field %q", cfgDelta.SQLBatchDriverField)
+	}
+	// Merge specific
+	m["${targetCommitBatchSize}"] = cfgDelta.CommitBatchSize
+	m["${targetExecBatchSize}"] = cfgDelta.ExecBatchSize
+	m["${targetKeyColumns}"] = pkTokens
+	m["${targetOtherColumns}"] = otherTokens
+	mustReplaceInStringUsingMapKeyVals(jsonPipe, m)
+	log.Debug("replaced reference JSON for snapshot ", *jsonPipe)
+	// Execute or export the transform.
+	if cfgDelta.ExportConfigType == "" { // if we should execute the transform...
+		ti := transform.NewSafeMapTransformInfo()
+		_, err := transform.LaunchTransformJson(log, ti, *jsonPipe, true, cfgDelta.StatsDumpFrequencySeconds)
+		if err != nil {
+			return errors.Wrap(err, "unable to unmarshal reference JSON to build the Oracle snapshot pipe")
+		}
+	} else { // else we should write the transform to STDOUT...
+		return outputPipeDefinition(log, *jsonPipe, cfgDelta.ExportConfigType, cfgDelta.ExportIncludeConnections)
+	}
+	return nil
+}

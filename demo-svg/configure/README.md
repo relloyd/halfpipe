@@ -54,7 +54,6 @@ Available Commands:
   query       Run a SQL query against a configured connection
   serve       Start a web service and listen for pipe commands described in JSON
   sync        Sync objects from source to target using batch or event-driven modes
-  user        Log in or out and show Halfpipe session details
   version     Show version information for Halfpipe
   help        Help about any command
 
@@ -64,17 +63,6 @@ Flags:
 Use "hp [command] --help" for more information about a command.
 
 halfpipe:~ $ # the Halfpipe 'hp' command usage is above for info.
-halfpipe:~ $ # now we can log in...
-halfpipe:~ $ # supply your auth key or use this one that has privs to run core features:
-halfpipe:~ $
-halfpipe:~ $ hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
-
-Halfpipe session started:
-  Current user:		tester1 at halfpipe dot sh
-  Authorized until:	Thu, 31 Dec 2020 00:00:00 UTC
-  Logout time:		Fri, 10 Jul 2020 11:48:12 UTC (23h59m59s)
-
-halfpipe:~ $
 halfpipe:~ $ # now let's set up database connections to Oracle, Snowflake and S3 etc.
 halfpipe:~ $ # we'll run the 'configure.sh' script to simplify this...
 halfpipe:~ $

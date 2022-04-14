@@ -1,0 +1,35 @@
+FROM worker-linux:latest as builder
+
+ARG BINARY_NAME
+ARG ORA_VERSION
+ARG APP_NAME=halfpipe
+
+ENV PATH "$PATH:/go/src/$APP_NAME/bin:."
+
+RUN mkdir -p src/$APP_NAME/dist
+
+WORKDIR /go/src/$APP_NAME
+
+COPY actions actions/
+COPY aws aws/
+COPY cmd cmd/
+COPY components components/
+COPY config config/
+COPY constants constants/
+COPY file file/
+COPY helper helper/
+COPY logger logger/
+COPY plugin-loader plugin-loader/
+COPY rdbms rdbms/
+COPY stats stats/
+COPY stream stream/
+COPY table-definition table-definition/
+COPY transform transform/
+COPY vendor vendor/
+COPY go.mod .
+COPY go.sum .
+COPY Makefile .
+COPY oci8-docker.pc $PKG_CONFIG_PATH/oci8.pc
+COPY main.go .
+
+#RUN make build-linux BINARY_NAME=$BINARY_NAME

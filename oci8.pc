@@ -1,0 +1,15 @@
+prefix=/devel/target/XXXXXXXXXXXXXXXXXXXXXXXXXX
+exec_prefix=${prefix}
+
+libdir=/usr/local/oracle/instantclient_12_2
+includedir=/usr/local/oracle/instantclient_12_2/sdk/include
+
+glib_genmarshal=glib-genmarshal
+gobject_query=gobject-query
+glib_mkenums=glib-mkenums
+
+Name: oci8
+Description: oci8 library
+Libs: -L${libdir} -lclntsh
+Cflags: -I${includedir}
+Version: 12.2

@@ -73,7 +73,6 @@ Available Commands:
   query       Run a SQL query against a configured connection
   serve       Start a web service and listen for pipe commands described in JSON
   sync        Sync objects from source to target using batch or event-driven modes
-  user        Log in or out and show Halfpipe session details
   version     Show version information for Halfpipe
   help        Help about any command
 
@@ -125,11 +124,6 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 # Build and start the Halfpipe Docker image with default AWS_PROFILE=halfpipe...
 
 ./start-halfpipe.sh
-
-# Once you're inside the Docker image, log in using a valid auth key like the 
-# one shown here:
-
-hp user login aiHbKdA0lZIs3a2VCWySQyixfgTDxhRMlHNZ7bDGkes33.t8LTnzd38.anwJ1nc
 
 # Run this script to create connections and set default flag values.
 # Follow the prompts and you're good to go:
@@ -272,12 +266,6 @@ The following files are AES-256 encrypted and base64 encoded at rest:
 * Database connections are stored in file `~/.halfpipe/connections.yaml` 
 
 Use the `config` CLI command to configure them.
-
-When a user session is started by running command `hp user login <auth-key>`, anyone with access to the CLI can essentially 
-use the database connections. Use `hp user logout` to end the session. 
-
-See usage by running `hp user login -h` and the `-d` flag to configure session duration. Default duration is 1 day.
-
 
 ## Limitations
 

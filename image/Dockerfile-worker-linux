@@ -1,0 +1,26 @@
+FROM golang:1.15
+
+ARG ORA_VERSION
+
+ENV LD_LIBRARY_PATH /usr/lib:/usr/local/lib:/usr/lib/instantclient
+ENV NLS_LANG "ENGLISH_UNITED KINGDOM.AL32UTF8"
+ENV PKG_CONFIG_PATH=/usr/local/pkgconfig
+ENV PATH "$PATH:/go/bin:."
+ENV GO111MODULE=on
+
+#COPY oracle-instantclient$ORA_VERSION*.rpm /tmp/
+COPY instantclient*$ORA_VERSION*.zip /tmp/
+
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends gcc curl git unzip pkg-config libaio1 unixodbc-dev \
+    && cd /tmp \
+    && for i in instantclient*$ORA_VERSION*.zip; do unzip "$i"; done \
+    && rm instantclient*$ORA_VERSION*.zip \
+    && mv instantclient* /usr/lib/instantclient \
+    && mkdir -p "$PKG_CONFIG_PATH" \
+    && mkdir -p /root/.ssh \
+    && chmod 600 /root/.ssh \
+    && git config --global url."git@gitlab.com:".insteadOf "https://gitlab.com/" \
+    && ssh-keyscan gitlab.com >> /root/.ssh/known_hosts
+
+CMD ["/bin/bash"]

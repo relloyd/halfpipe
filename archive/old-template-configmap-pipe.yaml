@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  {{ pipeNameNoSpaces }}.yaml: |
-{{ pipeDefinition }}
-kind: ConfigMap
-metadata:
-  name: {{ pipeNameNoSpaces }}-yaml
