@@ -84,4 +84,5 @@ cmd="docker run -ti --rm \\
     ${kube_mount} \\
     -p ${port}:8080 \\
     ${image_name}:${image_tag}"
+echo $cmd
 eval "$cmd"
