@@ -133,6 +133,9 @@ func (b *builder) resize(newBits int, init func(int)) {
 }
 
 func (b *builder) reserve(elements int, resize func(int)) {
+	if b.nullBitmap == nil {
+		b.nullBitmap = memory.NewResizableBuffer(b.mem)
+	}
 	if b.length+elements > b.capacity {
 		newCap := bitutil.NextPowerOf2(b.length + elements)
 		resize(newCap)
@@ -208,10 +211,11 @@ func (b *builder) UnsafeAppendBoolToBitmap(isValid bool) {
 	b.length++
 }
 
-func newBuilder(mem memory.Allocator, dtype arrow.DataType) Builder {
+func NewBuilder(mem memory.Allocator, dtype arrow.DataType) Builder {
 	// FIXME(sbinet): use a type switch on dtype instead?
 	switch dtype.ID() {
 	case arrow.NULL:
+		return NewNullBuilder(mem)
 	case arrow.BOOL:
 		return NewBooleanBuilder(mem)
 	case arrow.UINT8:
@@ -244,8 +248,12 @@ func newBuilder(mem memory.Allocator, dtype arrow.DataType) Builder {
 		typ := dtype.(*arrow.FixedSizeBinaryType)
 		return NewFixedSizeBinaryBuilder(mem, typ)
 	case arrow.DATE32:
+		return NewDate32Builder(mem)
 	case arrow.DATE64:
+		return NewDate64Builder(mem)
 	case arrow.TIMESTAMP:
+		typ := dtype.(*arrow.TimestampType)
+		return NewTimestampBuilder(mem, typ)
 	case arrow.TIME32:
 		typ := dtype.(*arrow.Time32Type)
 		return NewTime32Builder(mem, typ)
@@ -253,21 +261,49 @@ func newBuilder(mem memory.Allocator, dtype arrow.DataType) Builder {
 		typ := dtype.(*arrow.Time64Type)
 		return NewTime64Builder(mem, typ)
 	case arrow.INTERVAL:
-	case arrow.DECIMAL:
+		switch dtype.(type) {
+		case *arrow.DayTimeIntervalType:
+			return NewDayTimeIntervalBuilder(mem)
+		case *arrow.MonthIntervalType:
+			return NewMonthIntervalBuilder(mem)
+		case *arrow.MonthDayNanoIntervalType:
+			return NewMonthDayNanoIntervalBuilder(mem)
+		}
+	case arrow.INTERVAL_MONTHS:
+		return NewMonthIntervalBuilder(mem)
+	case arrow.INTERVAL_DAY_TIME:
+		return NewDayTimeIntervalBuilder(mem)
+	case arrow.INTERVAL_MONTH_DAY_NANO:
+		return NewMonthDayNanoIntervalBuilder(mem)
+	case arrow.DECIMAL128:
+		if typ, ok := dtype.(*arrow.Decimal128Type); ok {
+			return NewDecimal128Builder(mem, typ)
+		}
+	case arrow.DECIMAL256:
 	case arrow.LIST:
 		typ := dtype.(*arrow.ListType)
 		return NewListBuilder(mem, typ.Elem())
 	case arrow.STRUCT:
 		typ := dtype.(*arrow.StructType)
 		return NewStructBuilder(mem, typ)
-	case arrow.UNION:
+	case arrow.SPARSE_UNION:
+	case arrow.DENSE_UNION:
 	case arrow.DICTIONARY:
+	case arrow.LARGE_STRING:
+	case arrow.LARGE_BINARY:
+	case arrow.LARGE_LIST:
 	case arrow.MAP:
+		typ := dtype.(*arrow.MapType)
+		return NewMapBuilder(mem, typ.KeyType(), typ.ItemType(), typ.KeysSorted)
 	case arrow.EXTENSION:
+		typ := dtype.(arrow.ExtensionType)
+		return NewExtensionBuilder(mem, typ)
 	case arrow.FIXED_SIZE_LIST:
 		typ := dtype.(*arrow.FixedSizeListType)
 		return NewFixedSizeListBuilder(mem, typ.Len(), typ.Elem())
 	case arrow.DURATION:
+		typ := dtype.(*arrow.DurationType)
+		return NewDurationBuilder(mem, typ)
 	}
 	panic(fmt.Errorf("arrow/array: unsupported builder for %T", dtype))
 }

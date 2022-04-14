@@ -1,8 +1,6 @@
-package gosnowflake
+// Copyright (c) 2019-2022 Snowflake Computing Inc. All rights reserved.
 
-//
-// Copyright (c) 2019 Snowflake Computing Inc. All right reserved.
-//
+package gosnowflake
 
 import (
 	"bytes"
@@ -60,7 +58,7 @@ func buildResponse(application string) bytes.Buffer {
 func bindToPort() (net.Listener, error) {
 	l, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
-		glog.V(1).Infof("unable to bind to a port on localhost,  err: %v", err)
+		logger.Infof("unable to bind to a port on localhost,  err: %v", err)
 		return nil, err
 	}
 	return l, nil
@@ -72,7 +70,7 @@ func bindToPort() (net.Listener, error) {
 func openBrowser(idpURL string) error {
 	err := browser.OpenURL(idpURL)
 	if err != nil {
-		glog.V(1).Infof("failed to open a browser. err: %v", err)
+		logger.Infof("failed to open a browser. err: %v", err)
 		return err
 	}
 	return nil
@@ -90,9 +88,9 @@ func getIdpURLProofKey(
 	callbackPort int) (string, string, error) {
 
 	headers := make(map[string]string)
-	headers["Content-Type"] = headerContentTypeApplicationJSON
-	headers["accept"] = headerContentTypeApplicationJSON
-	headers["User-Agent"] = userAgent
+	headers[httpHeaderContentType] = headerContentTypeApplicationJSON
+	headers[httpHeaderAccept] = headerContentTypeApplicationJSON
+	headers[httpHeaderUserAgent] = userAgent
 
 	clientEnvironment := authRequestClientEnvironment{
 		Application: application,
@@ -115,7 +113,7 @@ func getIdpURLProofKey(
 
 	jsonBody, err := json.Marshal(authRequest)
 	if err != nil {
-		glog.V(1).Infof("failed to serialize json. err: %v", err)
+		logger.WithContext(ctx).Errorf("failed to serialize json. err: %v", err)
 		return "", "", err
 	}
 
@@ -141,7 +139,7 @@ func getTokenFromResponse(response string) (string, error) {
 	start := "GET /?token="
 	arr := strings.Split(response, "\r\n")
 	if !strings.HasPrefix(arr[0], start) {
-		glog.V(1).Info("response is malformed. ")
+		logger.Errorf("response is malformed. ")
 		return "", &SnowflakeError{
 			Number:      ErrFailedToParseResponse,
 			SQLState:    SQLStateConnectionRejected,
@@ -189,66 +187,65 @@ func authenticateByExternalBrowser(
 		return nil, nil, err
 	}
 
+	encodedSamlResponseChan := make(chan string)
+	errChan := make(chan error)
+
 	var encodedSamlResponse string
-	var acceptErr error
-	var tokenErr error
-	acceptErr = nil
-	for {
-		conn, err := l.Accept()
-		if err != nil {
-			glog.V(1).Infof("unable to accept connection. err: %v", err)
-			log.Fatal(err)
-		}
-		go func(c net.Conn) {
-			var buf bytes.Buffer
-			total := 0
-			for {
-				b := make([]byte, bufSize)
-				n, err := c.Read(b)
-				if err != nil {
-					if err != io.EOF {
-						glog.V(1).Infof("error reading from socket. err: %v", err)
-						acceptErr = err
+	var errFromGoroutine error
+	conn, err := l.Accept()
+	if err != nil {
+		logger.WithContext(ctx).Errorf("unable to accept connection. err: %v", err)
+		log.Fatal(err)
+	}
+	go func(c net.Conn) {
+		var buf bytes.Buffer
+		total := 0
+		encodedSamlResponse := ""
+		var errAccept error
+		for {
+			b := make([]byte, bufSize)
+			n, err := c.Read(b)
+			if err != nil {
+				if err != io.EOF {
+					logger.Infof("error reading from socket. err: %v", err)
+					errAccept = &SnowflakeError{
+						Number:      ErrFailedToGetExternalBrowserResponse,
+						SQLState:    SQLStateConnectionRejected,
+						Message:     errMsgFailedToGetExternalBrowserResponse,
+						MessageArgs: []interface{}{err},
 					}
-					break
 				}
-				total += n
-				buf.Write(b)
-				if n < bufSize {
-					// We successfully read all data
-					s := string(buf.Bytes()[:total])
-					encodedSamlResponse, tokenErr = getTokenFromResponse(s)
-					break
-				}
-				buf.Grow(bufSize)
+				break
 			}
-			if encodedSamlResponse != "" {
-				httpResponse := buildResponse(application)
-				c.Write(httpResponse.Bytes())
+			total += n
+			buf.Write(b)
+			if n < bufSize {
+				// We successfully read all data
+				s := string(buf.Bytes()[:total])
+				encodedSamlResponse, errAccept = getTokenFromResponse(s)
+				break
 			}
-			c.Close()
-		}(conn)
-		if acceptErr != nil || encodedSamlResponse != "" {
-			break
+			buf.Grow(bufSize)
 		}
-	}
-
-	if tokenErr != nil {
-		return nil, nil, tokenErr
-	}
-
-	if acceptErr != nil {
-		return nil, nil, &SnowflakeError{
-			Number:      ErrFailedToGetExternalBrowserResponse,
-			SQLState:    SQLStateConnectionRejected,
-			Message:     errMsgFailedToGetExternalBrowserResponse,
-			MessageArgs: []interface{}{acceptErr},
+		if encodedSamlResponse != "" {
+			httpResponse := buildResponse(application)
+			c.Write(httpResponse.Bytes())
 		}
+		c.Close()
+		encodedSamlResponseChan <- encodedSamlResponse
+		errChan <- errAccept
+	}(conn)
+
+	encodedSamlResponse = <-encodedSamlResponseChan
+	errFromGoroutine = <-errChan
+
+	if errFromGoroutine != nil {
+		return nil, nil, errFromGoroutine
 	}
 
 	escapedSamlResponse, err := url.QueryUnescape(encodedSamlResponse)
 	if err != nil {
-		glog.V(1).Infof("unable to unescape saml response. err: %v", err)
+		logger.WithContext(ctx).Errorf("unable to unescape saml response. err: %v", err)
 		return nil, nil, err
 	}
 	return []byte(escapedSamlResponse), []byte(proofKey), nil

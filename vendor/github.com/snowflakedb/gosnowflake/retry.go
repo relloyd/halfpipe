@@ -1,23 +1,20 @@
-// Copyright (c) 2017-2019 Snowflake Computing Inc. All right reserved.
+// Copyright (c) 2017-2022 Snowflake Computing Inc. All rights reserved.
 
 package gosnowflake
 
 import (
 	"bytes"
+	"context"
 	"crypto/x509"
 	"fmt"
-	"github.com/google/uuid"
 	"io"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
-
-	"context"
-
 	"sync"
+	"time"
 )
 
 var random *rand.Rand
@@ -26,19 +23,18 @@ func init() {
 	random = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
-// requestGUIDKey is attached to every request against Snowflake
-const requestGUIDKey string = "request_guid"
+const (
+	// requestGUIDKey is attached to every request against Snowflake
+	requestGUIDKey string = "request_guid"
+	// retryCounterKey is attached to query-request from the second time
+	retryCounterKey string = "retryCounter"
+	// requestIDKey is attached to all requests to Snowflake
+	requestIDKey string = "requestId"
+)
 
-// retryCounterKey is attached to query-request from the second time
-const retryCounterKey string = "retryCounter"
-
-// requestIDKey is attached to all requests to Snowflake
-const requestIDKey string = "requestId"
-
-// This class takes in an url during construction and replace the
-// value of request_guid every time the replace() is called
-// When the url does not contain request_guid, just return the original
-// url
+// This class takes in an url during construction and replaces the value of
+// request_guid every time replace() is called. If the url does not contain
+// request_guid, just return the original url
 type requestGUIDReplacer interface {
 	// replace the url with new ID
 	replace() *url.URL
@@ -79,11 +75,11 @@ type requestGUIDReplace struct {
 
 /**
 This function would replace they value of the requestGUIDKey in a url with a newly
-generated uuid
+generated UUID
 */
 func (replacer *requestGUIDReplace) replace() *url.URL {
 	replacer.urlValues.Del(requestGUIDKey)
-	replacer.urlValues.Add(requestGUIDKey, uuid.New().String())
+	replacer.urlValues.Add(requestGUIDKey, NewUUID().String())
 	replacer.urlPtr.RawQuery = replacer.urlValues.Encode()
 	return replacer.urlPtr
 }
@@ -210,7 +206,7 @@ func (r *retryHTTP) setBody(body []byte) *retryHTTP {
 
 func (r *retryHTTP) execute() (res *http.Response, err error) {
 	totalTimeout := r.timeout
-	glog.V(2).Infof("retryHTTP.totalTimeout: %v", totalTimeout)
+	logger.WithContext(r.ctx).Infof("retryHTTP.totalTimeout: %v", totalTimeout)
 	retryCounter := 0
 	sleepTime := time.Duration(0)
 
@@ -237,7 +233,7 @@ func (r *retryHTTP) execute() (res *http.Response, err error) {
 				return res, err
 			}
 			// cannot just return 4xx and 5xx status as the error can be sporadic. run often helps.
-			glog.V(2).Infof(
+			logger.WithContext(r.ctx).Warningf(
 				"failed http connection. no response is returned. err: %v. retrying...\n", err)
 		} else {
 			if res.StatusCode == http.StatusOK || r.raise4XX && res != nil && res.StatusCode >= 400 && res.StatusCode < 500 {
@@ -247,7 +243,7 @@ func (r *retryHTTP) execute() (res *http.Response, err error) {
 				// This is currently used for Snowflake login. The caller must generate an error object based on HTTP status.
 				break
 			}
-			glog.V(2).Infof(
+			logger.WithContext(r.ctx).Warningf(
 				"failed http connection. HTTP Status: %v. retrying...\n", res.StatusCode)
 			res.Body.Close()
 		}
@@ -255,7 +251,7 @@ func (r *retryHTTP) execute() (res *http.Response, err error) {
 		sleepTime = defaultWaitAlgo.decorr(retryCounter, sleepTime)
 
 		if totalTimeout > 0 {
-			glog.V(2).Infof("to timeout: %v", totalTimeout)
+			logger.WithContext(r.ctx).Infof("to timeout: %v", totalTimeout)
 			// if any timeout is set
 			totalTimeout -= sleepTime
 			if totalTimeout <= 0 {
@@ -277,7 +273,7 @@ func (r *retryHTTP) execute() (res *http.Response, err error) {
 			rUpdater = newRetryUpdate(r.fullURL)
 		}
 		r.fullURL = rUpdater.replaceOrAdd(retryCounter)
-		glog.V(2).Infof("sleeping %v. to timeout: %v. retrying", sleepTime, totalTimeout)
+		logger.WithContext(r.ctx).Infof("sleeping %v. to timeout: %v. retrying", sleepTime, totalTimeout)
 
 		await := time.NewTimer(sleepTime)
 		select {

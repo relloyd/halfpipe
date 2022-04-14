@@ -22,8 +22,8 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-/// Date is either a 32-bit or 64-bit type representing elapsed time since UNIX
-/// epoch (1970-01-01), stored in either of two units:
+/// Date is either a 32-bit or 64-bit signed integer type representing an
+/// elapsed time since UNIX epoch (1970-01-01), stored in either of two units:
 ///
 /// * Milliseconds (64 bits) indicating UNIX time elapsed since the epoch (no
 ///   leap seconds), where the values are evenly divisible by 86400000
@@ -51,20 +51,20 @@ func (rcv *Date) Table() flatbuffers.Table {
 func (rcv *Date) Unit() DateUnit {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
-		return rcv._tab.GetInt16(o + rcv._tab.Pos)
+		return DateUnit(rcv._tab.GetInt16(o + rcv._tab.Pos))
 	}
 	return 1
 }
 
 func (rcv *Date) MutateUnit(n DateUnit) bool {
-	return rcv._tab.MutateInt16Slot(4, n)
+	return rcv._tab.MutateInt16Slot(4, int16(n))
 }
 
 func DateStart(builder *flatbuffers.Builder) {
 	builder.StartObject(1)
 }
-func DateAddUnit(builder *flatbuffers.Builder, unit int16) {
-	builder.PrependInt16Slot(0, unit, 1)
+func DateAddUnit(builder *flatbuffers.Builder, unit DateUnit) {
+	builder.PrependInt16Slot(0, int16(unit), 1)
 }
 func DateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

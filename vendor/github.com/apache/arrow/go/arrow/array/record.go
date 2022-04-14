@@ -273,7 +273,7 @@ func NewRecordBuilder(mem memory.Allocator, schema *arrow.Schema) *RecordBuilder
 	}
 
 	for i, f := range schema.Fields() {
-		b.fields[i] = newBuilder(b.mem, f.Type)
+		b.fields[i] = NewBuilder(b.mem, f.Type)
 	}
 
 	return b
@@ -289,11 +289,10 @@ func (b *RecordBuilder) Retain() {
 func (b *RecordBuilder) Release() {
 	debug.Assert(atomic.LoadInt64(&b.refCount) > 0, "too many releases")
 
-	for _, f := range b.fields {
-		f.Release()
-	}
-
 	if atomic.AddInt64(&b.refCount, -1) == 0 {
+		for _, f := range b.fields {
+			f.Release()
+		}
 		b.fields = nil
 	}
 }

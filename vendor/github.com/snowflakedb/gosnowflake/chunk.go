@@ -1,3 +1,5 @@
+// Copyright (c) 2018-2022 Snowflake Computing Inc. All rights reserved.
+
 package gosnowflake
 
 import (
@@ -31,7 +33,7 @@ type largeChunkDecoder struct {
 }
 
 func decodeLargeChunk(r io.Reader, rowCount int, cellCount int) ([][]*string, error) {
-	glog.V(2).Info("custom JSON Decoder")
+	logger.Info("custom JSON Decoder")
 	lcd := largeChunkDecoder{
 		r, rowCount, cellCount,
 		0, 0,

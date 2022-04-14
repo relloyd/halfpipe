@@ -22,9 +22,20 @@ import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
 
-/// Time type. The physical storage type depends on the unit
-/// - SECOND and MILLISECOND: 32 bits
-/// - MICROSECOND and NANOSECOND: 64 bits
+/// Time is either a 32-bit or 64-bit signed integer type representing an
+/// elapsed time since midnight, stored in either of four units: seconds,
+/// milliseconds, microseconds or nanoseconds.
+///
+/// The integer `bitWidth` depends on the `unit` and must be one of the following:
+/// * SECOND and MILLISECOND: 32 bits
+/// * MICROSECOND and NANOSECOND: 64 bits
+///
+/// The allowed values are between 0 (inclusive) and 86400 (=24*60*60) seconds
+/// (exclusive), adjusted for the time unit (for example, up to 86400000
+/// exclusive for the MILLISECOND unit).
+/// This definition doesn't allow for leap seconds. Time values from
+/// measurements with leap seconds will need to be corrected when ingesting
+/// into Arrow (for example by replacing the value 86400 with 86399).
 type Time struct {
 	_tab flatbuffers.Table
 }
@@ -48,13 +59,13 @@ func (rcv *Time) Table() flatbuffers.Table {
 func (rcv *Time) Unit() TimeUnit {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
-		return rcv._tab.GetInt16(o + rcv._tab.Pos)
+		return TimeUnit(rcv._tab.GetInt16(o + rcv._tab.Pos))
 	}
 	return 1
 }
 
 func (rcv *Time) MutateUnit(n TimeUnit) bool {
-	return rcv._tab.MutateInt16Slot(4, n)
+	return rcv._tab.MutateInt16Slot(4, int16(n))
 }
 
 func (rcv *Time) BitWidth() int32 {
@@ -72,8 +83,8 @@ func (rcv *Time) MutateBitWidth(n int32) bool {
 func TimeStart(builder *flatbuffers.Builder) {
 	builder.StartObject(2)
 }
-func TimeAddUnit(builder *flatbuffers.Builder, unit int16) {
-	builder.PrependInt16Slot(0, unit, 1)
+func TimeAddUnit(builder *flatbuffers.Builder, unit TimeUnit) {
+	builder.PrependInt16Slot(0, int16(unit), 1)
 }
 func TimeAddBitWidth(builder *flatbuffers.Builder, bitWidth int32) {
 	builder.PrependInt32Slot(1, bitWidth, 32)
