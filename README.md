@@ -8,23 +8,24 @@
 
 ## Introduction
 
-Halfpipe is a command-line utility for streaming data to and from:
+Halfpipe is a single-binary, command-line utility for streaming data to and from:
 
 1. Snowflake
-1. Oracle
-1. SQL Server
-1. S3 Buckets
-1. ODBC connections (bring your own database drivers)
-1. Postgres support is on the [roadmap](#roadmap)
+2. Oracle
+3. SQL Server
+4. S3 Buckets
+5. Netezza
+6. ODBC connections (bring your own database drivers)
+7. Postgres support is on the [roadmap](#roadmap)
 
 It reduces the complexity of common data integration patterns to single commands that run the same on your workstations 
 as they do in production. Among other things it supports:
 
 * Extracting snapshots and deltas periodically
-* Oracle Continuous Query Notifications to stream in real-time
+* Oracle Continuous Query Notifications to stream in real-time (Oracle limitations apply)
 * HTTP service to start/stop/launch jobs
 * Automatic conversion of table metadata DDL
-* [Serverless](#support-for-serverless-with-aws-lambda---12-factor-mode), for simple productionisation in AWS Lambda
+* [Serverless](#support-for-serverless-with-aws-lambda---12-factor-mode), for  use in AWS Lambda
 
 
 ## Feature Demos
@@ -94,7 +95,16 @@ Use the [Quick Start](#quick-start) instructions below to build a local Docker i
 
 #### B) Bring You Own Oracle Drivers
 
-Download one of the Release binaries and add it to your target environment. Copy the plugins to `/usr/local/lib` to get started. If you don't want Oracle or ODBC functionality you should be good to just use the `hp` standalone binary. If you want Oracle functionality via the Oracle plugin, you'll need the Oracle Instant Client installed and on your PATH.  If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` ensure your ORACLE_HOME environment variable is set and the OCI library is accessible.  Follow Oracle's Instant Client set-up instructions and check SQL*Plus works then you should be good to go. The ODBC plugin requires unixODBC libraries. Run the [`configure.sh`](demo-svg/configure/README.md) script to learn how to set up basic connections.
+Download one of the Release binaries and add it to your target environment. Optionally, copy the plugins to `/usr/local/lib` depending on your connectivity requirements to get started. 
+If you don't want Oracle or ODBC functionality you should be good to just use the core `hp` standalone binary. 
+On the other hand, if you want Oracle functionality via the Oracle plugin, you'll need the Oracle Instant Client installed and on your PATH. 
+
+If you get an error like `hp: error while loading shared libraries: libclntsh.so.19.1: cannot open shared object file: No such file or directory` 
+ensure your ORACLE_HOME environment variable is set and the OCI library is accessible.  
+Follow Oracle's Instant Client set-up instructions and check SQL*Plus works then you should be good to go. 
+The ODBC plugin requires unixODBC libraries. 
+
+To configure connections, see the command usage or run the [`configure.sh`](demo-svg/configure/README.md) script to run a basic guided setup.
 
 
 ## Quick Start
