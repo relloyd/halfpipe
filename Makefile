@@ -116,33 +116,35 @@ install: build
 
 .PHONY: build
 build:
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -o dist/hp main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -o dist/hp main.go
 
 .PHONY: build-so
 build-so:
-	CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 	cp -p dist/hp-oracle-plugin.so /usr/local/lib
 	cp -p dist/hp-odbc-plugin.so /usr/local/lib
 
 .PHONY: build-race
 build-race:
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_DEV) -race -o dist/hp main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -race -o dist/hp main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 # build-linux target should be used inside Docker else the linking to OCI shared libraries are bad at runtime.
 .PHONY: build-linux
 build-linux: check-ora-vars
-	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -trimpath $(LD_FLAGS_RELEASE) -o dist/$(BINARY_NAME) main.go
-	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	# Note: ensure Oracle instant client libraries and header files can be found during compilation:
+	# LIBRARY_PATH and C_INCLUDE_PATH can be set to achieve this.
+	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -o dist/hp main.go
+	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 .PHONY: build-alpine
 build-alpine: check-ora-vars
-	CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_RELEASE) -o dist/$(BINARY_NAME) main.go
-	CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -o dist/hp main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 ###############################################################################
 # LINUX BUILDS VIA DOCKER
@@ -150,7 +152,7 @@ build-alpine: check-ora-vars
 
 .PHONY: docker-build
 docker-build:
-	scripts/docker-build.sh $(ORA_VERSION) hp-linux-amd64-$(HP_VERSION) relloyd/halfpipe-oracle-$(ORA_VERSION)-no-oci
+	scripts/docker-build.sh $(ORA_VERSION) $(HP_VERSION) relloyd/halfpipe-oracle-$(ORA_VERSION)
 
 .PHONY: docker-push-latest
 docker-push-latest:
@@ -160,8 +162,8 @@ docker-push-latest:
 docker-get-files:
 	$(eval RELEASE_DIR=dist/hp-linux-amd64-$(HP_VERSION)-oracle-$(ORA_VERSION))
 	mkdir -p $(RELEASE_DIR)
-	$(eval id=$(shell docker create relloyd/halfpipe-oracle-19.8-no-oci:$(HP_VERSION)))
-	docker cp $(id):/usr/local/bin/hp-linux-amd64-$(HP_VERSION)-oracle-$(ORA_VERSION) $(RELEASE_DIR)/hp
+	$(eval id=$(shell docker create relloyd/halfpipe-oracle-$(ORA_VERSION)):$(HP_VERSION)))
+	docker cp $(id):/usr/local/bin/hp $(RELEASE_DIR)
 	docker cp $(id):/usr/local/lib/hp-odbc-plugin.so $(RELEASE_DIR)
 	docker cp $(id):/usr/local/lib/hp-oracle-plugin.so $(RELEASE_DIR)
 	docker rm -v $(id)
@@ -178,9 +180,9 @@ release: release-darwin release-linux
 release-darwin:
 # TODO: make the plugins have the same version in their name OR remove version from name.
 	$(eval RELEASE_DIR=dist/hp-$(OSARCH)-$(GOARCH)-$(HP_VERSION)-oracle-$(ORA_VERSION))
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_RELEASE) -o $(RELEASE_DIR)/hp main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-oracle-plugin.so rdbms/oracle/main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 $(GOPRIVATE) go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-odbc-plugin.so rdbms/odbc/main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -o $(RELEASE_DIR)/hp main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-oracle-plugin.so rdbms/oracle/main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-odbc-plugin.so rdbms/odbc/main.go
 	@echo Release darwin complete
 
 .PHONY: release-linux

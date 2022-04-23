@@ -9,4 +9,4 @@ Name: oci8
 Description: oci8 library
 Libs: -L${libdir} -lclntsh
 Cflags: -I${includedir}
-Version: 19.8
+Version: 19.14
