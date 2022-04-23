@@ -153,7 +153,7 @@ docker-run:
 ###############################################################################
 
 .PHONY: quickstart
-quickstart:
+quickstart: docker-build
 	scripts/docker-build.sh $(ORA_VERSION) $(HP_VERSION) relloyd/halfpipe-oracle-$(ORA_VERSION)-quickstart quickstart && \
 	scripts/start-halfpipe.sh relloyd/halfpipe-oracle-$(ORA_VERSION)-quickstart:latest
 
