@@ -3,7 +3,7 @@
 ORA_VERSION=${1:?"Missing ORA_VERSION as \$1"}
 HP_VERSION=${2:?"Missing HP_VERSION as \$2"}
 IMAGE_NAME=${3:?"Missing IMAGE_NAME as \$3"}
-DOCKERFILE_SUFFIX=$5
+DOCKERFILE_SUFFIX=$4
 
 SCRIPT_DIR=$(dirname "$0")
 CURRENT_TAG=$(git describe --tags --abbrev=0)

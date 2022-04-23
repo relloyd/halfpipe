@@ -35,7 +35,7 @@ USER dataops
 
 # Scripts
 
-COPY --chown=dataops:dataops configure.sh /home/dataops/
-COPY --chown=dataops:dataops .template-variables.env /home/dataops/
+#COPY --chown=dataops:dataops scripts/configure.sh /home/dataops/
+#COPY --chown=dataops:dataops scripts/.template-variables.env /home/dataops/
 
 WORKDIR /home/dataops
