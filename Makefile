@@ -5,9 +5,9 @@
 TEST_MODULES = actions cmd components config constants file helper plugin-loader rdbms table-definition transform
 HP_VERSION:=$(shell git describe --tags --abbrev=0 | tr -d '[:space:]')
 ORA_VERSION=19.14
+BUILD_DATE=$(shell date +%F)  # use +%FT%H:%M%z for format '2020-10-08T17:55+0100'
 OSARCH=$(shell uname | tr "[:upper:]" "[:lower:]")
 GOARCH=amd64
-BUILD_DATE=$(shell date +%F)  # use +%FT%H:%M%z for format '2020-10-08T17:55+0100'
 LD_FLAGS:=-X github.com/relloyd/halfpipe/cmd.version=${HP_VERSION} -X github.com/relloyd/halfpipe/cmd.buildDate=${BUILD_DATE} -X github.com/relloyd/halfpipe/cmd.osArch=${OSARCH}
 LD_FLAGS_VERBOSE:="-v"
 LD_FLAGS_DEV:=-ldflags "${LD_FLAGS}"
@@ -115,12 +115,12 @@ build-linux: check-ora-vars
 	CGO_ENABLED=1 GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 ###############################################################################
-# BUILD & INSTALL
+# BUILD & INSTALL NATIVE BINARIES
 ###############################################################################
 
 .PHONY: install
 install: build
-	cp -p dist/hp ~/go/bin/
+	cp -p dist/hp $$GOPATH/bin/
 
 .PHONY: install-so
 install-so: build build-so
@@ -135,6 +135,31 @@ install-so: build build-so
 docker-build:
 	scripts/docker-build.sh $(ORA_VERSION) $(HP_VERSION) relloyd/halfpipe-oracle-$(ORA_VERSION)
 
+.PHONY: docker-run
+docker-run:
+	mkdir -p $$HOME/.halfpipe && \
+	docker run -ti --rm \
+		-v $$HOME/.halfpipe:/home/dataops/.halfpipe \
+		relloyd/halfpipe-oracle-$(ORA_VERSION):latest
+
+###############################################################################
+# QUICKSTART
+#
+# 1. Build the core halfpipe docker image with additional tools like
+#    AWS CLI, kubectl, k9s, less and other CLI hacks.
+# 2. Start the image with .aws and .halfpipe directories mounted
+#    and AWS_PROFILE=halfpipe
+#
+###############################################################################
+
+.PHONY: quickstart
+quickstart: docker-build
+	scripts/start-halfpipe.sh relloyd/halfpipe-oracle-$(ORA_VERSION):latest
+
+###############################################################################
+# RELEASES
+###############################################################################
+
 .PHONY: docker-get-files
 docker-get-files:
 	$(eval RELEASE_DIR=dist/hp-linux-amd64-$(HP_VERSION)-oracle-$(ORA_VERSION))
@@ -144,19 +169,6 @@ docker-get-files:
 	docker cp $(id):/usr/local/lib/hp-odbc-plugin.so $(RELEASE_DIR)
 	docker cp $(id):/usr/local/lib/hp-oracle-plugin.so $(RELEASE_DIR)
 	docker rm -v $(id)
-
-###############################################################################
-# QUICKSTART
-###############################################################################
-
-.PHONY: quickstart
-quickstart:
-	$(MAKE) docker-build
-	scripts/start-halfpipe.sh relloyd/halfpipe-oracle-$(ORA_VERSION)
-
-###############################################################################
-# RELEASES
-###############################################################################
 
 .PHONY: release
 release: release-darwin release-linux
