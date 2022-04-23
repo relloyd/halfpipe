@@ -164,15 +164,11 @@ quickstart: docker-build
 docker-get-files:
 	$(eval RELEASE_DIR=dist/hp-linux-amd64-$(HP_VERSION)-oracle-$(ORA_VERSION))
 	mkdir -p $(RELEASE_DIR)
-	$(eval id=$(shell docker create relloyd/halfpipe-oracle-$(ORA_VERSION)):$(HP_VERSION)))
+	$(eval id=$(shell docker create relloyd/halfpipe-oracle-$(ORA_VERSION):$(HP_VERSION)))
 	docker cp $(id):/usr/local/bin/hp $(RELEASE_DIR)
 	docker cp $(id):/usr/local/lib/hp-odbc-plugin.so $(RELEASE_DIR)
 	docker cp $(id):/usr/local/lib/hp-oracle-plugin.so $(RELEASE_DIR)
 	docker rm -v $(id)
-
-.PHONY: release
-release: release-darwin release-linux
-	@echo Release complete
 
 .PHONY: release-darwin
 release-darwin:
@@ -185,3 +181,7 @@ release-darwin:
 .PHONY: release-linux
 release-linux: docker-build docker-get-files
 	@echo Release linux complete
+
+.PHONY: release
+release: release-darwin release-linux
+	@echo Release complete
