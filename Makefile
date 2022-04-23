@@ -4,7 +4,7 @@
 
 TEST_MODULES = actions cmd components config constants file helper plugin-loader rdbms table-definition transform
 HP_VERSION:=$(shell git describe --tags --abbrev=0 | tr -d '[:space:]')
-ORA_VERSION=19.8
+ORA_VERSION=19.14
 OSARCH=$(shell uname | tr "[:upper:]" "[:lower:]")
 GOARCH=amd64
 BUILD_DATE=$(shell date +%F)  # use +%FT%H:%M%z for format '2020-10-08T17:55+0100'
@@ -14,7 +14,6 @@ LD_FLAGS_DEV:=-ldflags "${LD_FLAGS}"
 LD_FLAGS_RELEASE:=-ldflags "${LD_FLAGS} -s -w"
 # GC_FLAGS_GOLAND is used to work around build errors produced because hp plugins appear to be compiled with different library versions due to path issues.
 GC_FLAGS_GOLAND:=-gcflags "all=-N -l"
-GOPRIVATE=GOPRIVATE=github.com/relloyd
 
 define command-export-aws-keys
 	$(eval export AWS_ACCESS_KEY_ID=$(shell aws configure get aws_access_key_id --profile halfpipe))
@@ -61,26 +60,6 @@ tag-next:
 	@echo "Bumped tag to: $(NEXT_TAG)"
 
 ###############################################################################
-# WORKERS
-###############################################################################
-
-.PHONY: docker-worker-linux
-docker-worker-linux:
-	cd image && docker build -t worker-linux --build-arg ORA_VERSION=$(ORA_VERSION) -f Dockerfile-worker-linux .
-
-.PHONY: docker-worker-alpine
-docker-worker-alpine:
-	cd image && docker build -t worker-alpine --build-arg ORA_VERSION=$(ORA_VERSION) -f Dockerfile-worker-alpine .
-
-.PHONY: docker-compile-hp-linux
-docker-compile-hp-linux:
-	scripts/docker-build.sh $(ORA_VERSION) hp-linux-$(HP_VERSION) relloyd/halfpipe-built-oracle-$(ORA_VERSION) hp-compiled
-
-.PHONY: docker-build-alpine
-docker-build-alpine:
-	scripts/docker-build.sh $(ORA_VERSION) hp-linux-$(HP_VERSION) relloyd/halfpipe-alpine-oracle-$(ORA_VERSION) alpine
-
-###############################################################################
 # TESTING
 ###############################################################################
 
@@ -106,10 +85,6 @@ test-modules:
 .PHONY: test
 test: test-modules
 
-.PHONY: install
-install: build
-	cp -p dist/hp ~/go/bin/
-
 ###############################################################################
 # BUILD BINARIES
 ###############################################################################
@@ -120,10 +95,8 @@ build:
 
 .PHONY: build-so
 build-so:
-	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
-	cp -p dist/hp-oracle-plugin.so /usr/local/lib
-	cp -p dist/hp-odbc-plugin.so /usr/local/lib
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 .PHONY: build-race
 build-race:
@@ -134,11 +107,12 @@ build-race:
 # build-linux target should be used inside Docker else the linking to OCI shared libraries are bad at runtime.
 .PHONY: build-linux
 build-linux: check-ora-vars
-	# Note: ensure Oracle instant client libraries and header files can be found during compilation:
+	# Pre-requisites:
+	# Ensure Oracle instant client libraries and header files can be found during compilation:
 	# LIBRARY_PATH and C_INCLUDE_PATH can be set to achieve this.
-	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -o dist/hp main.go
-	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	CGO_ENABLED=1 $(GOPRIVATE) GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	CGO_ENABLED=1 GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -o dist/hp main.go
+	CGO_ENABLED=1 GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 .PHONY: build-alpine
 build-alpine: check-ora-vars
@@ -147,16 +121,25 @@ build-alpine: check-ora-vars
 	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 ###############################################################################
+# BUILD & INSTALL
+###############################################################################
+
+.PHONY: install
+install: build
+	cp -p dist/hp ~/go/bin/
+
+.PHONY: install-so
+install-so: build build-so
+	cp -p dist/hp-oracle-plugin.so /usr/local/lib
+	cp -p dist/hp-odbc-plugin.so /usr/local/lib
+
+###############################################################################
 # LINUX BUILDS VIA DOCKER
 ###############################################################################
 
 .PHONY: docker-build
 docker-build:
 	scripts/docker-build.sh $(ORA_VERSION) $(HP_VERSION) relloyd/halfpipe-oracle-$(ORA_VERSION)
-
-.PHONY: docker-push-latest
-docker-push-latest:
-	scripts/docker-push-latest.sh $(ORA_VERSION)
 
 .PHONY: docker-get-files
 docker-get-files:
@@ -178,7 +161,6 @@ release: release-darwin release-linux
 
 .PHONY: release-darwin
 release-darwin:
-# TODO: make the plugins have the same version in their name OR remove version from name.
 	$(eval RELEASE_DIR=dist/hp-$(OSARCH)-$(GOARCH)-$(HP_VERSION)-oracle-$(ORA_VERSION))
 	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -o $(RELEASE_DIR)/hp main.go
 	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-oracle-plugin.so rdbms/oracle/main.go
@@ -186,5 +168,5 @@ release-darwin:
 	@echo Release darwin complete
 
 .PHONY: release-linux
-release-linux: docker-build docker-push-latest docker-get-files
+release-linux: docker-build docker-get-files
 	@echo Release linux complete
