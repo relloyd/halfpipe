@@ -122,18 +122,19 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 
 ### Prerequisites
 
-1. Docker
-1. An S3 bucket to be used as an external Snowflake stage
-1. A valid profile entry in AWS CLI file `~/.aws/credentials` (by default this needs to be called `halfpipe` - notes on how to override it are below) that can read/write the S3 bucket above
-1. Oracle database connection details
-1. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure/README.md) documentation to learn more if you're not using Snowflake)  
+1. Make
+2. Docker
+3. An S3 bucket to be used as an external Snowflake stage
+4. A valid profile entry in AWS CLI file `~/.aws/credentials` (by default this needs to be called `halfpipe` - notes on how to override it are below) that can read/write the S3 bucket above
+5. Oracle database connection details
+6. Snowflake database connection details (please see the [`configure.sh`](demo-svg/configure/README.md) documentation to learn more if you're not using Snowflake)  
 
 ### Steps
 
 ```bash
 # Build and start the Halfpipe Docker image with default AWS_PROFILE=halfpipe...
 
-./start-halfpipe.sh
+make quickstart
 
 # Run this script to create connections and set default flag values.
 # Follow the prompts and you're good to go:
@@ -143,13 +144,6 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 
 where: 
 
-* `start-halfpipe.sh` builds and starts a Docker image that contains the Halfpipe CLI and Oracle drivers. 
-  By default, it uses an `AWS_PROFILE` called "halfpipe" to supply IAM credentials.
-  Use `-h` to see usage and the `-a` flag to override this.
-* The `hp user login` command above is valid for a user called `tester1@halfpipe.sh`. It has privileges required
-  to configure Halfpipe and execute core actions like `cp meta`, `cp snap` and `query`. 
-  If you'd like to take more features for a spin, please reach out to me using my [email](#want-to-know-more-or-have-a-feature-request) below.
-  See also the [Notes](#notes) below for some security considerations.
 * `configure.sh -c` requests user input and runs the basic set-up to create connections to Oracle, Snowflake and S3. 
   Here's an example [transcript](./demo-svg/configure/README.md). See the help output of [`configure.sh -h`](./demo-svg/configure/README.md#usage-of-configuresh) 
   to learn more about the `hp` commands required to create connections and set default flag values.  
@@ -228,6 +222,38 @@ In summary, the post describes how to create a Lambda with environment variables
 You can use the main Halfpipe binary `hp` (zipped ~7 MB) on its own when connecting between Snowflake, SQL Server and S3, 
 but if you require Oracle or ODBC connectivity, you'll need to publish a Lambda layer with the Halfpipe plugins 
 (see release binaries) and database client drivers.
+
+### Usage
+
+```bash
+$ hp 12f
+
+Halfpipe can be controlled by environment variables and is a good fit to run
+in serverless environments where the binary size is compatible.
+
+To enable Twelve-Factor mode, set environment variable HP_12FACTOR_MODE=1.
+To supply flags documented by the regular command-line usage, set an
+equivalent environment variable using the following convention:
+
+<HP>_<flag long-name in upper case>
+
+For example, this will copy a snapshot of data from sqlserver table
+dbo.test_data_types to S3:
+
+export HP_12FACTOR_MODE=1
+export HP_LOG_LEVEL=debug
+export HP_COMMAND=cp
+export HP_SUBCOMMAND=snap
+export HP_SOURCE_DSN='sqlserver://user:password@localhost:1433/database'
+export HP_SOURCE_TYPE=sqlserver
+export HP_TARGET_DSN=s3://test.halfpipe.sh/halfpipe
+export HP_TARGET_TYPE=s3
+export HP_TARGET_S3_REGION=eu-west-2
+export HP_SOURCE_OBJECT=dbo.test_data_types
+export HP_TARGET_OBJECT=test_data_types
+
+Then execute the CLI tool without any arguments or flags to kick off the pipeline.
+```
 
 
 ## Features
