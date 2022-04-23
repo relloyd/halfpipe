@@ -8,19 +8,15 @@ ENV LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/lib/instantclient
 ENV LIBRARY_PATH=$LD_LIBRARY_PATH
 ENV C_INCLUDE_PATH=/usr/lib/instantclient/sdk/include
 ENV NLS_LANG "ENGLISH_UNITED KINGDOM.AL32UTF8"
-ENV PKG_CONFIG_PATH=/usr/local/pkgconfig
 ENV PATH "$PATH:/go/bin:."
 ENV GO111MODULE=on
 
 RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends gcc curl git unzip pkg-config libaio1 unixodbc-dev \
+    && apt-get install -y --no-install-recommends gcc curl git unzip libaio1 unixodbc-dev \
     && cd /tmp \
-    && mkdir -p "$PKG_CONFIG_PATH" \
     && mkdir -p /root/.ssh \
     && chmod 600 /root/.ssh \
     && ssh-keyscan github.com >> /root/.ssh/known_hosts
-
-# Oracle client (use LD_LIBRARY_PATH from parent image).
 
 RUN cd /tmp \
     && curl -L https://download.oracle.com/otn_software/linux/instantclient/1914000/instantclient-basiclite-linux.x64-${ORA_VERSION}.0.0.0dbru.zip -o instantclient-basiclite-linux.zip \
@@ -34,7 +30,6 @@ ENV PATH "$PATH:/go/src/$APP_NAME/bin:."
 RUN mkdir -p src/$APP_NAME/dist
 WORKDIR /go/src/$APP_NAME
 COPY . .
-COPY oci8-docker.pc $PKG_CONFIG_PATH/oci8.pc
 
 RUN make build-linux
 
@@ -57,7 +52,7 @@ RUN mkdir -p /home/$USER_AND_GROUP_NAME \
     && useradd -s /bin/sh -d "$HOME_DIR" -g "$USER_AND_GROUP_NAME" -u $USER_AND_GROUP_ID "$USER_AND_GROUP_NAME" \
     && chown -R $USER_AND_GROUP_NAME:$USER_AND_GROUP_NAME $HOME_DIR \
     && apt-get update -y \
-    && apt-get install -y --no-install-recommends unixodbc ca-certificates
+    && apt-get install -y --no-install-recommends unzip unixodbc ca-certificates
 
 # Halfpipe
 
@@ -75,7 +70,7 @@ RUN cd /tmp \
 USER $USER_AND_GROUP_NAME
 WORKDIR $HOME_DIR
 
-RUN echo "export PS1='\033[0;96mhalfpipe:\033[1;34m\W \033[0;96m$\033[0m '" >> .bashrc \
+RUN echo "export PS1='\[\033[0;1;36m\]halfpipe:\[\033[0;1;34m\]\W \[\033[0;1;36m\]$\[\033[0m\] '" >> .bashrc \
     && echo "alias ll='ls -l'" >> .bashrc \
     && echo "alias la='ls -la'" >> .bashrc \
     && echo "hp" >> .bashrc \
