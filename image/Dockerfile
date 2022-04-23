@@ -31,7 +31,7 @@ RUN mkdir -p src/$APP_NAME/dist
 WORKDIR /go/src/$APP_NAME
 COPY . .
 
-RUN make build-linux
+RUN --mount=type=cache,target=/root/.cache/go-build make build-linux
 
 ###############################################################################
 ###############################################################################

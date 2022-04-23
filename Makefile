@@ -114,12 +114,6 @@ build-linux: check-ora-vars
 	CGO_ENABLED=1 GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
 	CGO_ENABLED=1 GOOS=$(OSARCH) GOARCH=$(GOARCH) go build -v -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
-.PHONY: build-alpine
-build-alpine: check-ora-vars
-	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -o dist/hp main.go
-	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
-
 ###############################################################################
 # BUILD & INSTALL
 ###############################################################################
@@ -150,6 +144,15 @@ docker-get-files:
 	docker cp $(id):/usr/local/lib/hp-odbc-plugin.so $(RELEASE_DIR)
 	docker cp $(id):/usr/local/lib/hp-oracle-plugin.so $(RELEASE_DIR)
 	docker rm -v $(id)
+
+###############################################################################
+# QUICKSTART
+###############################################################################
+
+.PHONY: quickstart
+quickstart:
+	$(MAKE) docker-build
+	scripts/start-halfpipe.sh relloyd/halfpipe-oracle-$(ORA_VERSION)
 
 ###############################################################################
 # RELEASES
