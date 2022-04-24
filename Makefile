@@ -119,13 +119,14 @@ build-linux: check-ora-vars
 ###############################################################################
 
 .PHONY: install
-install: build
+install: build build-so
 	cp -p dist/hp $$GOPATH/bin/
-
-.PHONY: install-so
-install-so: install build-so
 	cp -p dist/hp-oracle-plugin.so /usr/local/lib
 	cp -p dist/hp-odbc-plugin.so /usr/local/lib
+
+.PHONY: install-core
+install-core: build
+	cp -p dist/hp $$GOPATH/bin/
 
 ###############################################################################
 # LINUX BUILDS VIA DOCKER

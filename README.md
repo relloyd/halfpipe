@@ -85,7 +85,7 @@ Use "hp [command] --help" for more information about a command.
 
 ## Deployment
 
-Halfpipe is a light-weight Golang binary compiled against Oracle Database 19.5 Instant Client drivers (it's backwards compatible with older Oracle versions too). 
+Halfpipe is a light-weight Golang binary compiled against Oracle Database Instant Client drivers. 
 
 Choose *__one__* of these options to get going:
 
@@ -106,6 +106,26 @@ The ODBC plugin requires unixODBC libraries.
 
 To configure connections, see the command usage or run the [`configure.sh`](demo-svg/configure/README.md) script to run a basic guided setup.
 
+#### C) Compile From Source
+
+Building the core `hp` binary is simple as only relies on native Go libraries.
+
+For Oracle and ODBC connectivity you'll need to have the Oracle instantclient and ODBC drivers locally, as well
+as export your DY_LD_LIBRARY_PATH (macOS) or LD_LIBRARY_PATH (linux) so the C linker can find the right
+shared objects:
+
+```bash
+# Build the core `hp` binary...
+make build
+
+# Build the plugins for Oracle and ODBC connectivity...
+# Ensure DY_LD_LIBRARY_PATH or LD_LIBRARY_PATH variable is set.
+make build-so
+
+# Install the core `hp` binary AND plugins...
+# Ensure DY_LD_LIBRARY_PATH or LD_LIBRARY_PATH variable is set.
+make install
+```
 
 ## Quick Start
 
@@ -133,12 +153,10 @@ Good luck and drop me an [email](#want-to-know-more-or-have-a-feature-request) i
 
 ```bash
 # Build and start the Halfpipe Docker image with default AWS_PROFILE=halfpipe...
-
 make quickstart
 
-# Run this script to create connections and set default flag values.
+# From inside the Docker container, run this script to create connections and set default flag values.
 # Follow the prompts and you're good to go:
-
 ./configure.sh -c
 ```
 
