@@ -7,7 +7,7 @@ USER root
 # AWS CLI
 
 RUN apt-get update -y \
-    && apt-get install -y curl less vim libaio1 ca-certificates unzip glibc-source groff \
+    && apt-get install -y curl less vim unzip glibc-source groff \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
     && ./aws/install \

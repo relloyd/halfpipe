@@ -38,7 +38,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build make build-linux
 
 FROM debian:stretch-slim
 
-ENV LIBRARY_PATH /usr/lib:/usr/local/lib:/usr/lib/instantclient
+ENV LD_LIBRARY_PATH=/usr/lib:/usr/local/lib:/usr/lib/instantclient
+ENV LIBRARY_PATH=$LD_LIBRARY_PATH
 ENV NLS_LANG "ENGLISH_UNITED KINGDOM.AL32UTF8"
 ENV PATH "$PATH:/home/dataops:."
 
@@ -52,7 +53,7 @@ RUN mkdir -p /home/$USER_AND_GROUP_NAME \
     && useradd -s /bin/sh -d "$HOME_DIR" -g "$USER_AND_GROUP_NAME" -u $USER_AND_GROUP_ID "$USER_AND_GROUP_NAME" \
     && chown -R $USER_AND_GROUP_NAME:$USER_AND_GROUP_NAME $HOME_DIR \
     && apt-get update -y \
-    && apt-get install -y --no-install-recommends unzip unixodbc ca-certificates
+    && apt-get install -y --no-install-recommends unzip unixodbc ca-certificates libaio1
 
 # Halfpipe
 
