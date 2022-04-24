@@ -91,18 +91,18 @@ test: test-modules
 
 .PHONY: build
 build:
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -o dist/hp main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -o dist/hp main.go
 
 .PHONY: build-so
 build-so:
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) $(GC_FLAGS_GOLAND) -buildmode=plugin -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 .PHONY: build-race
 build-race:
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -race -o dist/hp main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -race -o dist/hp main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_DEV) -buildmode=plugin -race -o dist/hp-odbc-plugin.so rdbms/odbc/main.go
 
 # build-linux target should be used inside Docker else the linking to OCI shared libraries are bad at runtime.
 .PHONY: build-linux
@@ -123,7 +123,7 @@ install: build
 	cp -p dist/hp $$GOPATH/bin/
 
 .PHONY: install-so
-install-so: build build-so
+install-so: install build-so
 	cp -p dist/hp-oracle-plugin.so /usr/local/lib
 	cp -p dist/hp-odbc-plugin.so /usr/local/lib
 
@@ -174,9 +174,9 @@ docker-get-files:
 .PHONY: release-darwin
 release-darwin:
 	$(eval RELEASE_DIR=dist/hp-$(OSARCH)-$(GOARCH)-$(HP_VERSION)-oracle-$(ORA_VERSION))
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -o $(RELEASE_DIR)/hp main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-oracle-plugin.so rdbms/oracle/main.go
-	PKG_CONFIG_PATH=$(CURDIR) CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-odbc-plugin.so rdbms/odbc/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -o $(RELEASE_DIR)/hp main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-oracle-plugin.so rdbms/oracle/main.go
+	CGO_ENABLED=1 go build -trimpath $(LD_FLAGS_RELEASE) -buildmode=plugin -o $(RELEASE_DIR)/hp-odbc-plugin.so rdbms/odbc/main.go
 	@echo Release darwin complete
 
 .PHONY: release-linux
