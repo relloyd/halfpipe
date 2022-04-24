@@ -110,9 +110,8 @@ To configure connections, see the command usage or run the [`configure.sh`](demo
 
 Building the core `hp` binary is simple as only relies on native Go libraries.
 
-For Oracle and ODBC connectivity you'll need to have the Oracle instantclient and ODBC drivers locally, as well
-as export your DY_LD_LIBRARY_PATH (macOS) or LD_LIBRARY_PATH (linux) so the C linker can find the right
-shared objects:
+For Oracle and ODBC connectivity, you'll need to have the Oracle instantclient (including SDK with header files) and ODBC drivers locally, as well
+as to export DY_LD_LIBRARY_PATH (macOS) or LD_LIBRARY_PATH (linux) so the C linker can find the right shared objects:
 
 ```bash
 # Build the core `hp` binary...
